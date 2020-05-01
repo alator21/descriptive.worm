@@ -10,8 +10,16 @@
   "author": "Rafael Triantafillidis",
   "license": "ISC",
   "dependencies": {
+    "chalk": "^4.0.0",
+    "command-line-args": "^5.1.1",
+    "dotenv": "^8.2.0",
+    "expand-home-dir": "0.0.3",
+    "readline-sync": "^1.4.10",
+    "table": "^5.4.6",
+    "uuid": "^7.0.3"
+  },
+  "devDependencies": {
     "@types/node": "^13.13.4",
-    "i": "^0.3.6",
-    "npm": "^6.14.4"
+    "@types/uuid": "^7.0.3"
   }
 }
