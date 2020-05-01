@@ -1,0 +1,13 @@
+{
+  "CD": "cd",
+  "ls": "ls -lh",
+  "LS": "ls",
+  "CLEAR": "clear",
+  "nvm": "clear",
+  "cd..": "cd ..",
+  "CD..": "cd..",
+  "CCLS": "ccls",
+  "rafr": "exec $SHELL",
+  "cdb": "cd ~/Scripts/Basz",
+  "rkill": "pkill -f"
+}

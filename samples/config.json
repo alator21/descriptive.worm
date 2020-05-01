@@ -1,0 +1,10 @@
+[
+  {
+    "_id": "59e19a7b-baa3-415b-a43e-02c32b144b7d",
+    "_name": "main",
+    "_isActive": true,
+    "_ps1": "\\[\\033[38;5;160m\\]\\h\\[\\033[38;5;220m\\]|\\[\\033[0m\\]\\w \\[\\033[38;5;118m\\]$\\[\\033[0m\\] ",
+    "_startupFile": "/home/alator/.nbasz/profiles/main/startup.json",
+    "_aliasesFile": "/home/alator/.nbasz/profiles/main/aliases.json"
+  }
+]
