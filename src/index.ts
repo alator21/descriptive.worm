@@ -1,5 +1,4 @@
 #!/usr/bin/env ts-node
-import * as expandHomeDir from "expand-home-dir";
 import {Menu} from "./Menu";
 
 require("dotenv").config();
