@@ -30,26 +30,42 @@ export class StartShFile {
         fs.writeFileSync(this._path, '');
     }
 
-    update(startups: string[], aliases: Map<string, string>, ps1: string): void {
+    update(startups: string[], aliases: Map<string, string>, paths: string[], ps1: string): void {
         if (!this.exists()) {
             this.touch();
         }
         let output: string = `#!/bin/bash\n`;
-        output += `\n\n`;
-        output += `#Startups\n`;
-        for (let startup of startups) {
-            output += `source ${startup};\n`;
+        if (startups.length > 0 ){
+            output += `\n\n`;
+            output += `#Startups\n`;
+            for (let startup of startups) {
+                output += `source ${startup};\n`;
+            }
         }
-        output += `\n\n`;
-        output += `#Aliases\n`;
-        aliases.forEach((value, key) => {
-            output += `alias ${key}=\"${value}\";\n`;
-        });
+
+        if (aliases.size > 0){
+            output += `\n\n`;
+            output += `#Aliases\n`;
+            aliases.forEach((value, key) => {
+                output += `alias ${key}=\"${value}\";\n`;
+            });
+        }
+
+
+        if (paths.length > 0){
+            output += `\n\n`;
+            output += `#Path\n`;
+            for (let path of paths) {
+                output += `PATH=$PATH:${path}\n`;
+            }
+        }
+
         if (ps1 != null) {
             output += `\n\n`;
             output += `#Prompt\n`;
             output += `export PS1=\"${ps1}\"`;
         }
+        output += `\n`;
 
 
         fs.writeFileSync(this._path, output);

@@ -8,6 +8,8 @@ import {AliasesFile} from "./AliasesFile";
 import * as  readlineSync from "readline-sync";
 import {ProfileNameDoesNotExist} from "./exceptions/ProfileNameDoesNotExist";
 import * as commandLineArgs from "command-line-args";
+import {PathsFile} from "./PathsFile";
+import {Exception} from "./exceptions/Exception";
 
 export class Menu {
 
@@ -21,20 +23,29 @@ export class Menu {
             {name: `enable`, alias: `e`, type: String},
             {name: `help`, alias: `h`, type: Boolean}
         ]
-        const options = commandLineArgs(optionDefinitions);
-        // console.log(options);
-        if (options[`init`]) {
-            this.init(BASHRC_PATH, STARTSH_PATH);
-        } else if (options[`list`]) {
-            this.list(DEFAULT_CONFIG_PATH);
-        } else if (options[`new-profile`]) {
-            this.newProfile(DEFAULT_CONFIG_PATH, STARTSH_PATH);
-        } else if (options['refresh']) {
-            this.refresh(DEFAULT_CONFIG_PATH, STARTSH_PATH);
-        } else if (options['enable']) {
-            this.enableProfile(options['enable'], DEFAULT_CONFIG_PATH, STARTSH_PATH);
-        } else if (options['help']) {
-            this.help();
+        try {
+            const options = commandLineArgs(optionDefinitions);
+            // console.log(options);
+            if (options[`init`]) {
+                this.init(BASHRC_PATH, STARTSH_PATH);
+            } else if (options[`list`]) {
+                this.list(DEFAULT_CONFIG_PATH);
+            } else if (options[`new-profile`]) {
+                this.newProfile(DEFAULT_CONFIG_PATH, STARTSH_PATH);
+            } else if (options['refresh']) {
+                this.refresh(DEFAULT_CONFIG_PATH, STARTSH_PATH);
+            } else if (options['enable']) {
+                this.enableProfile(options['enable'], DEFAULT_CONFIG_PATH, STARTSH_PATH);
+            } else if (options['help']) {
+                this.help();
+            }
+        } catch (exception) {
+            if (exception instanceof Exception) {
+                console.error(exception.toString());
+                process.exit(1);
+            }
+            console.error(exception);
+            process.exit(1);
         }
     }
 
@@ -76,6 +87,10 @@ export class Menu {
         let aliasesPathFromUser: string = readlineSync.question(`Aliases path: `);
         const aliasesFile: AliasesFile = AliasesFile.create(aliasesPathFromUser);
         newProfile.updateAliasesPath(aliasesFile);
+
+        let pathsPathFromUser: string = readlineSync.question(`Paths path: `);
+        const pathsFile: PathsFile = PathsFile.create(pathsPathFromUser);
+        newProfile.updatePathsPath(pathsFile);
 
 
         let ps1FromUser: string = readlineSync.question('PS1(or empty for default)');
@@ -145,9 +160,10 @@ export class Menu {
         let startupFile: StartupFile = StartupFile.create(activeProfile.startupFile);
         let aliasesFile: AliasesFile = AliasesFile.create(activeProfile.aliasesFile);
         let ps1: string | null = activeProfile.ps1;
+        let pathsFile: PathsFile = PathsFile.create(activeProfile.pathsFile);
 
         const startShFile: StartShFile = StartShFile.create(STARTSH_PATH);
-        startShFile.update(startupFile.startupPaths, aliasesFile.aliases,ps1);
+        startShFile.update(startupFile.startupPaths, aliasesFile.aliases, pathsFile.paths, ps1);
     }
 
 
