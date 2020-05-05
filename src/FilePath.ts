@@ -36,4 +36,11 @@ export class FilePath {
         }
         fs.writeFileSync(this.expandedPath, data);
     }
+
+    appendSync(data: string): void {
+        if (this.expandedPath == null){
+            throw new Error('');
+        }
+        fs.appendFileSync(this.expandedPath, data)
+    }
 }

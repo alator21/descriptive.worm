@@ -1,4 +1,3 @@
-import * as fs from 'fs';
 import {FilePath} from "./FilePath";
 import {FilePathIsNotValidException} from "./exceptions/FilePathIsNotValidException";
 
@@ -26,11 +25,12 @@ export class BashRcFile {
     }
 
     appendSourceStart(startShPath: string): void {
-        if (this.sourceStartExists(startShPath)){
+        if (this.sourceStartExists(startShPath)) {
             console.warn(`Already initialized.`);
             return;
         }
-        fs.appendFileSync(this._path, startShPath)
+        let filePath: FilePath = FilePath.create(this._path);
+        filePath.appendSync(startShPath);
     }
 
     get path(): string {
