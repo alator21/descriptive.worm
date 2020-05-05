@@ -45,7 +45,7 @@ export class StartShFile {
             .map(extension => {
                 const filePath: FilePath = FilePath.create(extension);
                 if (!filePath.isValid()) {
-                    throw new Error("")
+                    throw new FilePathIsNotValidException(extension);
                 }
                 return extension;
             });

@@ -10,7 +10,7 @@ export class FilePathIsNotValidException extends Exception {
     }
 
     toString() {
-        return `FilePathIsNotValidException{${this.path}}`;
+        return `FilePathIsNotValidException[${this.path}]`;
     }
 
 
