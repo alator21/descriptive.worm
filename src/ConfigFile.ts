@@ -109,9 +109,6 @@ export class ConfigFile {
         options.columns = options.columns || Object.keys(data[0]);
         options.headerStyleFn = options.headerStyleFn || chalk.bold;
         const header = options.columns.map(property => options.headerStyleFn(property));
-        const config = {
-
-        }
         const tableText = table([
             header,
             ...data.map(item => options.columns.map(property => item[property]))
