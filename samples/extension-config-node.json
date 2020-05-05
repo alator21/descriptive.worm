@@ -1,0 +1,8 @@
+{
+  "_id": "59e19a7b-baa3-415b-a43e-02c32b144b7d",
+  "_name": "extension-node",
+  "_pathsFile": "./profiles/node/paths.json",
+  "_startupFile": "./profiles/node/startup.json",
+  "_aliasesFile": "./profiles/node/aliases.json",
+  "_extensions": []
+}

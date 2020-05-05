@@ -19,7 +19,7 @@ export class StartupFile {
         if (!filePath.isValid()) {
             throw new FilePathIsNotValidException(path);
         }
-        let startupFile: string = fs.readFileSync(path, 'utf8');
+        let startupFile: string = filePath.readSync();
 
         let startupPaths: any[] = JSON.parse(startupFile);
         if (!Array.isArray(startupPaths)) {
@@ -29,7 +29,7 @@ export class StartupFile {
             if (typeof p !== 'string') {
                 throw new StartupFileWrongFormatException();
             }
-            let startupPath: FilePath = FilePath.create(expandHomeDir(p));
+            let startupPath: FilePath = FilePath.create(p);
             if (!startupPath.isValid()) {
                 throw new StartupFileWrongFormatException();
             }
@@ -50,6 +50,7 @@ export class StartupFile {
         let output: string = JSON.stringify(this._startupPaths, null, 2);
         // console.log('startup--');
         // console.log(output);
-        fs.writeFileSync(this.path, output)
+        const startupFile: FilePath = FilePath.create(this._path);
+        startupFile.writeSync(output);
     }
 }

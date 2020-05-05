@@ -7,7 +7,6 @@ import {FilePathIsNotValidException} from "./exceptions/FilePathIsNotValidExcept
 import * as chalk from "chalk";
 import {table} from 'table';
 import {PathsFile} from "./PathsFile";
-import * as expandHomeDir from "expand-home-dir";
 
 export class ConfigFile {
     private readonly _path: string;
@@ -24,15 +23,15 @@ export class ConfigFile {
         if (!filePath.isValid()) {
             throw new FilePathIsNotValidException(path);
         }
-        let configFile: string = fs.readFileSync(path, 'utf8');
+        let configFile: string = filePath.readSync();
 
         let json = JSON.parse(configFile);
         let profiles: Profile[] = []
         for (let key of Object.keys(json)) {
             let profileJson = json[key];
-            let {_id, _name, _startupFile, _aliasesFile, _isActive, _ps1, _pathsFile} = profileJson;
+            let {_id, _name, _startupFile, _aliasesFile, _isActive, _ps1, _pathsFile, _extensions} = profileJson;
             profiles.push(
-                Profile.restore(_id, _name, _isActive, _ps1, PathsFile.create(expandHomeDir(_pathsFile)), StartupFile.create(expandHomeDir(_startupFile)), AliasesFile.create(expandHomeDir(_aliasesFile)))
+                Profile.restore(_id, _name, _isActive, _ps1, PathsFile.create(_pathsFile), StartupFile.create(_startupFile), AliasesFile.create(_aliasesFile), _extensions)
             );
         }
 
@@ -80,7 +79,8 @@ export class ConfigFile {
         let output: string = JSON.stringify(this.profiles, null, 2);
         // console.log('config--');
         // console.log(output);
-        fs.writeFileSync(this._path, output)
+        const configFile: FilePath = FilePath.create(this._path);
+        configFile.writeSync(output);
     }
 
     printProfilesToConsole() {
@@ -93,6 +93,7 @@ export class ConfigFile {
                 'paths': chalk.yellow(profile.pathsFile),
                 'startup': chalk.yellow(profile.startupFile),
                 'aliases': chalk.yellow(profile.aliasesFile),
+                'extensions': chalk.magenta(profile.extensions.join(',')),
                 'active': chalk.cyan(profile.isActive)
             });
         }
@@ -112,7 +113,7 @@ export class ConfigFile {
         const tableText = table([
             header,
             ...data.map(item => options.columns.map(property => item[property]))
-        ],{
+        ], {
             columnDefault: {
                 width: 15
             }

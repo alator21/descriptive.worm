@@ -1,6 +1,7 @@
 import * as fs from 'fs';
 import {FilePath} from "./FilePath";
 import {FilePathIsNotValidException} from "./exceptions/FilePathIsNotValidException";
+import {Profile} from "./Profile";
 
 export class StartShFile {
     private readonly _path: string;
@@ -27,7 +28,37 @@ export class StartShFile {
             console.warn(`Start.sh already exists`);
             return;
         }
-        fs.writeFileSync(this._path, '');
+        const startShFile: FilePath = FilePath.create(this._path);
+        startShFile.writeSync('');
+    }
+
+
+    refresh(profile: Profile, STARTSH_PATH: string): void {
+        if (profile == null) {
+            console.warn(`No active profile selected.`);
+            return;
+        }
+        const startupsFilePath: string | null = profile.startupFile;
+        const aliasesFilePath: string | null = profile.aliasesFile;
+        const pathsFilePath: string | null = profile.pathsFile;
+        const extensions: string[] = profile.extensions
+            .map(extension => {
+                const filePath: FilePath = FilePath.create(extension);
+                if (!filePath.isValid()) {
+                    throw new Error("")
+                }
+                return extension;
+            });
+
+
+        const startupPaths: string[] = Profile.getStartupPaths(startupsFilePath, extensions);
+        const aliases: Map<string, string> = Profile.getAliases(aliasesFilePath, extensions);
+        const paths: string[] = Profile.getPaths(pathsFilePath, extensions);
+
+        let ps1: string | null = profile.ps1;
+
+        const startShFile: StartShFile = StartShFile.create(STARTSH_PATH);
+        startShFile.update(startupPaths, aliases, paths, ps1);
     }
 
     update(startups: string[], aliases: Map<string, string>, paths: string[], ps1: string): void {
@@ -35,7 +66,7 @@ export class StartShFile {
             this.touch();
         }
         let output: string = `#!/bin/bash\n`;
-        if (startups.length > 0 ){
+        if (startups.length > 0) {
             output += `\n\n`;
             output += `#Startups\n`;
             for (let startup of startups) {
@@ -43,7 +74,7 @@ export class StartShFile {
             }
         }
 
-        if (aliases.size > 0){
+        if (aliases.size > 0) {
             output += `\n\n`;
             output += `#Aliases\n`;
             aliases.forEach((value, key) => {
@@ -52,7 +83,7 @@ export class StartShFile {
         }
 
 
-        if (paths.length > 0){
+        if (paths.length > 0) {
             output += `\n\n`;
             output += `#Path\n`;
             for (let path of paths) {
@@ -68,7 +99,8 @@ export class StartShFile {
         output += `\n`;
 
 
-        fs.writeFileSync(this._path, output);
+        const startShFile: FilePath = FilePath.create(this._path);
+        startShFile.writeSync(output);
     }
 
     get path(): string {

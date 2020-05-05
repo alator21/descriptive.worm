@@ -113,12 +113,14 @@ export class Menu {
         startupFile.writeToDisc();
         aliasesFile.writeToDisc();
 
-        Menu.refreshStartSh(config, STARTSH_PATH);
+        const startSh: StartShFile = StartShFile.create(STARTSH_PATH);
+        startSh.refresh(config.getActive(), STARTSH_PATH);
     }
 
     private refresh(DEFAULT_CONFIG_PATH: string, STARTSH_PATH: string): void {
         let config: ConfigFile = ConfigFile.create(DEFAULT_CONFIG_PATH);
-        Menu.refreshStartSh(config, STARTSH_PATH);
+        const startSh: StartShFile = StartShFile.create(STARTSH_PATH);
+        startSh.refresh(config.getActive(), STARTSH_PATH);
     }
 
     private enableProfile(profileName: string, DEFAULT_CONFIG_PATH: string, STARTSH_PATH: string): void {
@@ -143,28 +145,11 @@ export class Menu {
         }
 
         config.writeToDisc();
-        Menu.refreshStartSh(config, STARTSH_PATH);
+        const startSh: StartShFile = StartShFile.create(STARTSH_PATH);
+        startSh.refresh(config.getActive(), STARTSH_PATH);
     }
 
     private help(): void {
         console.log('HELP-blabla');
     }
-
-    private static refreshStartSh(config: ConfigFile, STARTSH_PATH: string) {
-        let activeProfile: Profile = config.getActive();
-        if (activeProfile == null) {
-            console.warn(`No active profile selected.`);
-            return;
-        }
-
-        let startupFile: StartupFile = StartupFile.create(activeProfile.startupFile);
-        let aliasesFile: AliasesFile = AliasesFile.create(activeProfile.aliasesFile);
-        let ps1: string | null = activeProfile.ps1;
-        let pathsFile: PathsFile = PathsFile.create(activeProfile.pathsFile);
-
-        const startShFile: StartShFile = StartShFile.create(STARTSH_PATH);
-        startShFile.update(startupFile.startupPaths, aliasesFile.aliases, pathsFile.paths, ps1);
-    }
-
-
 }

@@ -20,7 +20,8 @@ export class BashRcFile {
     }
 
     private sourceStartExists(startShPath: string): boolean {
-        const bashRc = fs.readFileSync(this._path);
+        const bashRcFile = FilePath.create(this._path);
+        const bashRc = bashRcFile.readSync();
         return bashRc.includes(`source ${startShPath}`);
     }
 

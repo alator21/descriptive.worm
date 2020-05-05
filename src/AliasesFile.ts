@@ -17,7 +17,7 @@ export class AliasesFile {
         if (!filePath.isValid()) {
             throw new FilePathIsNotValidException(path);
         }
-        let aliasesFile: string = fs.readFileSync(path, 'utf8');
+        let aliasesFile: string = filePath.readSync();
 
         let json = JSON.parse(aliasesFile);
         let aliases: Map<string, string> = new Map<string, string>();
@@ -43,6 +43,7 @@ export class AliasesFile {
         let output: string = JSON.stringify(aliasesAsObject, null, 2);
         // console.log('aliases--');
         // console.log(output);
-        fs.writeFileSync(this.path, output)
+        const aliasesFile: FilePath = FilePath.create(this.path);
+        aliasesFile.writeSync(output);
     }
 }

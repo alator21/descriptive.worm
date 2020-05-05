@@ -18,7 +18,7 @@ export class PathsFile {
         if (!filePath.isValid()) {
             throw new FilePathIsNotValidException(path);
         }
-        let pathFile: string = fs.readFileSync(path, 'utf8');
+        let pathFile: string = filePath.readSync();
 
         let paths: any[] = JSON.parse(pathFile);
         if (!Array.isArray(paths)) {
@@ -45,6 +45,7 @@ export class PathsFile {
         let output: string = JSON.stringify(this._paths, null, 2);
         // console.log('path--');
         // console.log(output);
-        fs.writeFileSync(this.path, output)
+        const pathsFile: FilePath = FilePath.create(this._path);
+        pathsFile.writeSync(output);
     }
 }
