@@ -1,8 +1,6 @@
-import * as fs from 'fs';
 import {FilePath} from "./FilePath";
 import {FilePathIsNotValidException} from "./exceptions/FilePathIsNotValidException";
 import {StartupFileWrongFormatException} from "./exceptions/StartupFileWrongFormatException";
-import * as expandHomeDir from "expand-home-dir";
 
 export class StartupFile {
     private readonly _path: string;
