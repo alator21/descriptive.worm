@@ -36,7 +36,7 @@ export class Profile {
         return new Profile(id, name, isActive, ps1, pathsPath, startupPath, aliasesPath, extensions);
     }
 
-    setPs1(ps1: string) {
+    setPs1(ps1: string|null) {
         this._ps1 = ps1;
     }
 

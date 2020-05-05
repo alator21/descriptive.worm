@@ -3,16 +3,16 @@ import {FilePathIsNotValidException} from "./exceptions/FilePathIsNotValidExcept
 import {StartupFileWrongFormatException} from "./exceptions/StartupFileWrongFormatException";
 
 export class StartupFile {
-    private readonly _path: string;
+    private readonly _path: string | null;
     private readonly _startupPaths: string[];
 
 
-    private constructor(path: string, startupPaths: string[]) {
+    private constructor(path: string | null, startupPaths: string[]) {
         this._path = path;
         this._startupPaths = startupPaths;
     }
 
-    static create(path: string): StartupFile {
+    static create(path: string | null): StartupFile {
         let filePath: FilePath = FilePath.create(path);
         if (!filePath.isValid()) {
             throw new FilePathIsNotValidException(path);
@@ -36,7 +36,7 @@ export class StartupFile {
     }
 
 
-    get path(): string {
+    get path(): string | null {
         return this._path;
     }
 

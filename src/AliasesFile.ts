@@ -3,16 +3,16 @@ import {FilePath} from "./FilePath";
 import {FilePathIsNotValidException} from "./exceptions/FilePathIsNotValidException";
 
 export class AliasesFile {
-    private readonly _path: string;
+    private readonly _path: string|null;
     private readonly _aliases: Map<string, string>;
 
 
-    private constructor(path: string, startupPaths: Map<string, string>) {
+    private constructor(path: string|null, startupPaths: Map<string, string>) {
         this._path = path;
         this._aliases = startupPaths;
     }
 
-    static create(path: string): AliasesFile {
+    static create(path: string | null): AliasesFile {
         let filePath: FilePath = FilePath.create(path);
         if (!filePath.isValid()) {
             throw new FilePathIsNotValidException(path);
@@ -27,7 +27,7 @@ export class AliasesFile {
         return new AliasesFile(path, aliases);
     }
 
-    get path(): string {
+    get path(): string|null {
         return this._path;
     }
 
@@ -36,7 +36,7 @@ export class AliasesFile {
     }
 
     writeToDisc() {
-        let aliasesAsObject: object = {};
+        let aliasesAsObject: any = {};
         this._aliases.forEach((value, key) => {
             aliasesAsObject[key] = value;
         });

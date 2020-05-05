@@ -7,7 +7,7 @@ import {StartupFile} from "./StartupFile";
 import {AliasesFile} from "./AliasesFile";
 import * as  readlineSync from "readline-sync";
 import {ProfileNameDoesNotExist} from "./exceptions/ProfileNameDoesNotExist";
-import * as commandLineArgs from "command-line-args";
+import commandLineArgs = require('command-line-args');
 import {PathsFile} from "./PathsFile";
 import {Exception} from "./exceptions/Exception";
 
@@ -114,13 +114,20 @@ export class Menu {
         aliasesFile.writeToDisc();
 
         const startSh: StartShFile = StartShFile.create(STARTSH_PATH);
-        startSh.refresh(config.getActive(), STARTSH_PATH);
+        if (activeProfile == null) {
+            return;
+        }
+        startSh.refresh(activeProfile, STARTSH_PATH);
     }
 
     private refresh(DEFAULT_CONFIG_PATH: string, STARTSH_PATH: string): void {
         let config: ConfigFile = ConfigFile.create(DEFAULT_CONFIG_PATH);
+        let activeProfile: Profile | null = config.getActive();
+        if (activeProfile == null) {
+            return;
+        }
         const startSh: StartShFile = StartShFile.create(STARTSH_PATH);
-        startSh.refresh(config.getActive(), STARTSH_PATH);
+        startSh.refresh(activeProfile, STARTSH_PATH);
     }
 
     private enableProfile(profileName: string, DEFAULT_CONFIG_PATH: string, STARTSH_PATH: string): void {
@@ -145,8 +152,11 @@ export class Menu {
         }
 
         config.writeToDisc();
+        if (activeProfile == null){
+            return;
+        }
         const startSh: StartShFile = StartShFile.create(STARTSH_PATH);
-        startSh.refresh(config.getActive(), STARTSH_PATH);
+        startSh.refresh(activeProfile, STARTSH_PATH);
     }
 
     private help(): void {

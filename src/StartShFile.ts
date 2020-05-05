@@ -61,7 +61,7 @@ export class StartShFile {
         startShFile.update(startupPaths, aliases, paths, ps1);
     }
 
-    update(startups: string[], aliases: Map<string, string>, paths: string[], ps1: string): void {
+    update(startups: string[], aliases: Map<string, string>, paths: string[], ps1: string | null): void {
         if (!this.exists()) {
             this.touch();
         }

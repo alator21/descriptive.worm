@@ -1,19 +1,18 @@
 import {Profile} from "./Profile";
 import {FilePath} from "./FilePath";
-import * as fs from "fs";
 import {StartupFile} from "./StartupFile";
 import {AliasesFile} from "./AliasesFile";
 import {FilePathIsNotValidException} from "./exceptions/FilePathIsNotValidException";
-import * as chalk from "chalk";
+const chalk = require('chalk');
 import {table} from 'table';
 import {PathsFile} from "./PathsFile";
 
 export class ConfigFile {
-    private readonly _path: string;
+    private readonly _path: string | null;
     private readonly _profiles: Profile[];
 
 
-    private constructor(path: string, profiles: Profile[]) {
+    private constructor(path: string | null, profiles: Profile[]) {
         this._path = path;
         this._profiles = profiles;
     }
@@ -67,7 +66,7 @@ export class ConfigFile {
     }
 
 
-    get path(): string {
+    get path(): string | null {
         return this._path;
     }
 
@@ -98,21 +97,21 @@ export class ConfigFile {
             });
         }
         ConfigFile.printTable(output, {
-            headerStyleFn: header => chalk.bold(chalk.red(header))
+            headerStyleFn: (header: any) => chalk.bold(chalk.red(header))
         });
     }
 
-    private static printTable(data, options) {
+    private static printTable(data: any, options: any) {
         if (!data || !data.length) {
             return;
         }
         options = options || {};
         options.columns = options.columns || Object.keys(data[0]);
         options.headerStyleFn = options.headerStyleFn || chalk.bold;
-        const header = options.columns.map(property => options.headerStyleFn(property));
+        const header = options.columns.map((property: any) => options.headerStyleFn(property));
         const tableText = table([
             header,
-            ...data.map(item => options.columns.map(property => item[property]))
+            ...data.map((item: { [x: string]: any; }) => options.columns.map((property: string | number) => item[property]))
         ], {
             columnDefault: {
                 width: 15
