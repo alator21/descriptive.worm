@@ -2,10 +2,11 @@ import {Profile} from "./Profile";
 import {FilePath} from "./FilePath";
 import {StartupFile} from "./StartupFile";
 import {AliasesFile} from "./AliasesFile";
-import {FilePathIsNotValidException} from "./exceptions/FilePathIsNotValidException";
-const chalk = require('chalk');
 import {table} from 'table';
 import {PathsFile} from "./PathsFile";
+import {ConfigFileWrongFormatException} from "./exceptions/ConfigFileWrongFormatException";
+
+const chalk = require('chalk');
 
 export class ConfigFile {
     private readonly _path: string | null;
@@ -20,21 +21,30 @@ export class ConfigFile {
     static create(path: string): ConfigFile {
         let filePath: FilePath = FilePath.create(path);
         if (!filePath.isValid()) {
-            throw new FilePathIsNotValidException(path);
+            filePath.touch();
         }
         let configFile: string = filePath.readSync();
 
-        let json = JSON.parse(configFile);
-        let profiles: Profile[] = []
-        for (let key of Object.keys(json)) {
-            let profileJson = json[key];
-            let {_id, _name, _startupFile, _aliasesFile, _isActive, _ps1, _pathsFile, _extensions} = profileJson;
-            profiles.push(
-                Profile.restore(_id, _name, _isActive, _ps1, PathsFile.create(_pathsFile), StartupFile.create(_startupFile), AliasesFile.create(_aliasesFile), _extensions)
-            );
+        try{
+            let json = JSON.parse(configFile);
+            let profiles: Profile[] = []
+            for (let key of Object.keys(json)) {
+                let profileJson = json[key];
+                let {_id, _name, _startupFile, _aliasesFile, _isActive, _ps1, _pathsFile, _extensions} = profileJson;
+                profiles.push(
+                    Profile.restore(_id, _name, _isActive, _ps1, PathsFile.create(_pathsFile), StartupFile.create(_startupFile), AliasesFile.create(_aliasesFile), _extensions)
+                );
+            }
+
+            return new ConfigFile(path, profiles);
+        }
+        catch (exception) {
+            if (exception instanceof SyntaxError){
+                throw new ConfigFileWrongFormatException();
+            }
+            throw exception;
         }
 
-        return new ConfigFile(path, profiles);
     }
 
 

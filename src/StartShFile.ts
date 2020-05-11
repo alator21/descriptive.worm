@@ -14,7 +14,7 @@ export class StartShFile {
     static create(path: string): StartShFile {
         let filePath: FilePath = FilePath.create(path);
         if (!filePath.isValid()) {
-            throw new FilePathIsNotValidException(path);
+            filePath.touch();
         }
         return new StartShFile(path);
     }
