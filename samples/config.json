@@ -7,6 +7,7 @@
     "_pathsFile": "./profiles/main/paths.json",
     "_startupFile": "./profiles/main/startup.json",
     "_aliasesFile": "./profiles/main/aliases.json",
+    "_startupCommandsFile": "./profiles/main/startup-commands.json",
     "_extensions": [
       "./extension-config-node.json"
     ]

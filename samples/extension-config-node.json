@@ -4,5 +4,6 @@
   "_pathsFile": "./profiles/node/paths.json",
   "_startupFile": "./profiles/node/startup.json",
   "_aliasesFile": "./profiles/node/aliases.json",
+  "_startupCommandsFile": "./profiles/node/startup-commands.json",
   "_extensions": []
 }

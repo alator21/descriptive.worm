@@ -39,6 +39,7 @@ export class StartShFile {
             return;
         }
         const startupsFilePath: string | null = profile.startupFile;
+        const startupCommandsFilePath: string | null = profile.startupCommandsFile;
         const aliasesFilePath: string | null = profile.aliasesFile;
         const pathsFilePath: string | null = profile.pathsFile;
         const extensions: string[] = profile.extensions
@@ -52,16 +53,17 @@ export class StartShFile {
 
 
         const startupPaths: string[] = Profile.getStartupPaths(startupsFilePath, extensions);
+        const startupCommands: string[] = Profile.getStartupCommands(startupCommandsFilePath, extensions);
         const aliases: Map<string, string> = Profile.getAliases(aliasesFilePath, extensions);
         const paths: string[] = Profile.getPaths(pathsFilePath, extensions);
 
         let ps1: string | null = profile.ps1;
 
         const startShFile: StartShFile = StartShFile.create(STARTSH_PATH);
-        startShFile.update(startupPaths, aliases, paths, ps1);
+        startShFile.update(startupPaths, aliases, paths, startupCommands, ps1);
     }
 
-    update(startups: string[], aliases: Map<string, string>, paths: string[], ps1: string | null): void {
+    update(startups: string[], aliases: Map<string, string>, paths: string[], startupCommands: string[], ps1: string | null): void {
         if (!this.exists()) {
             this.touch();
         }
@@ -88,6 +90,14 @@ export class StartShFile {
             output += `#Path\n`;
             for (let path of paths) {
                 output += `PATH=$PATH:${path}\n`;
+            }
+        }
+
+        if (startupCommands.length > 0) {
+            output += `\n\n`;
+            output += `#Commands\n`;
+            for (let command of startupCommands) {
+                output += `${command}\n`;
             }
         }
 

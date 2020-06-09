@@ -5,6 +5,7 @@ import {AliasesFile} from "./AliasesFile";
 import {table} from 'table';
 import {PathsFile} from "./PathsFile";
 import {ConfigFileWrongFormatException} from "./exceptions/ConfigFileWrongFormatException";
+import {StartupCommandsFile} from "./StartupCommandsFile";
 
 const chalk = require('chalk');
 
@@ -25,21 +26,21 @@ export class ConfigFile {
         }
         let configFile: string = filePath.readSync();
 
-        try{
+        try {
             let json = JSON.parse(configFile);
             let profiles: Profile[] = []
             for (let key of Object.keys(json)) {
                 let profileJson = json[key];
-                let {_id, _name, _startupFile, _aliasesFile, _isActive, _ps1, _pathsFile, _extensions} = profileJson;
+                let {_id, _name, _startupFile, _aliasesFile, _isActive, _ps1, _pathsFile, _startupCommandsFile, _extensions} = profileJson;
                 profiles.push(
-                    Profile.restore(_id, _name, _isActive, _ps1, PathsFile.create(_pathsFile), StartupFile.create(_startupFile), AliasesFile.create(_aliasesFile), _extensions)
+                    Profile.restore(_id, _name, _isActive, _ps1, PathsFile.create(_pathsFile), StartupFile.create(_startupFile), AliasesFile.create(_aliasesFile), StartupCommandsFile.create(_startupCommandsFile), _extensions
+                    )
                 );
             }
 
             return new ConfigFile(path, profiles);
-        }
-        catch (exception) {
-            if (exception instanceof SyntaxError){
+        } catch (exception) {
+            if (exception instanceof SyntaxError) {
                 throw new ConfigFileWrongFormatException();
             }
             throw exception;
@@ -102,6 +103,7 @@ export class ConfigFile {
                 'paths': chalk.yellow(profile.pathsFile),
                 'startup': chalk.yellow(profile.startupFile),
                 'aliases': chalk.yellow(profile.aliasesFile),
+                'startup-commands': chalk.yellow(profile.startupCommandsFile),
                 'extensions': chalk.magenta(profile.extensions.join(',')),
                 'active': chalk.cyan(profile.isActive)
             });

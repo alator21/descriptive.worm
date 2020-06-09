@@ -3,6 +3,7 @@ import {StartupFile} from "./StartupFile";
 import {AliasesFile} from "./AliasesFile";
 import {PathsFile} from "./PathsFile";
 import {ExtensionConfigFile} from "./ExtensionConfigFile";
+import {StartupCommandsFile} from "./StartupCommandsFile";
 
 export class Profile {
     private readonly _id: string;
@@ -12,10 +13,11 @@ export class Profile {
     private _pathsFile: string | null;
     private _startupFile: string | null;
     private _aliasesFile: string | null;
+    private _startupCommandsFile: string | null;
     private _extensions: string[];
 
 
-    private constructor(id: string, name: string, isActive: boolean, ps1: string | null, pathsPath: PathsFile | null, startupPath: StartupFile | null, aliasesPath: AliasesFile | null, extensions: string[]) {
+    private constructor(id: string, name: string, isActive: boolean, ps1: string | null, pathsPath: PathsFile | null, startupPath: StartupFile | null, aliasesPath: AliasesFile | null, startupCommandsFile: StartupCommandsFile | null, extensions: string[]) {
         this._id = id;
         this._name = name;
         this._isActive = isActive;
@@ -23,20 +25,21 @@ export class Profile {
         this._pathsFile = (pathsPath && pathsPath.path) || null;
         this._startupFile = (startupPath && startupPath.path) || null;
         this._aliasesFile = (aliasesPath && aliasesPath.path) || null;
+        this._startupCommandsFile = (startupCommandsFile && startupCommandsFile.path) || null;
         this._extensions = extensions;
     }
 
 
     static create(name: string): Profile {
         const id: string = uuidv4();
-        return new Profile(id, name, false, null, null, null, null, []);
+        return new Profile(id, name, false, null, null, null, null, null, []);
     }
 
-    static restore(id: string, name: string, isActive: boolean, ps1: string | null, pathsPath: PathsFile | null, startupPath: StartupFile | null, aliasesPath: AliasesFile | null, extensions: string[]): Profile {
-        return new Profile(id, name, isActive, ps1, pathsPath, startupPath, aliasesPath, extensions);
+    static restore(id: string, name: string, isActive: boolean, ps1: string | null, pathsPath: PathsFile | null, startupPath: StartupFile | null, aliasesPath: AliasesFile | null, startupCommandsFile: StartupCommandsFile | null, extensions: string[]): Profile {
+        return new Profile(id, name, isActive, ps1, pathsPath, startupPath, aliasesPath, startupCommandsFile, extensions);
     }
 
-    setPs1(ps1: string|null) {
+    setPs1(ps1: string | null) {
         this._ps1 = ps1;
     }
 
@@ -137,6 +140,20 @@ export class Profile {
         return aliases;
     }
 
+    static getStartupCommands(startupCommandsFilePath: string | null, extensions: string[]): string[] {
+        let startupCommandsFile: StartupCommandsFile = StartupCommandsFile.create(startupCommandsFilePath);
+
+        let paths: string[] = startupCommandsFile.startupCommands;
+
+        for (let extension of extensions) {
+            let extensionConfig: ExtensionConfigFile = ExtensionConfigFile.create(extension);
+            let extensionPathsFilePath = extensionConfig.profile.startupFile;
+            let extensionExtensions = extensionConfig.profile.extensions;
+            paths.push(...this.getStartupPaths(extensionPathsFilePath, extensionExtensions));
+        }
+        return paths;
+    }
+
 
     get id(): string {
         return this._id;
@@ -166,6 +183,10 @@ export class Profile {
 
     get aliasesFile(): string | null {
         return this._aliasesFile;
+    }
+
+    get startupCommandsFile(): string | null {
+        return this._startupCommandsFile;
     }
 
     get extensions(): string[] {

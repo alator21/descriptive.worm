@@ -4,6 +4,7 @@ import {AliasesFile} from "./AliasesFile";
 import {FilePathIsNotValidException} from "./exceptions/FilePathIsNotValidException";
 import {PathsFile} from "./PathsFile";
 import {ExtensionProfile} from "./ExtensionProfile";
+import {StartupCommandsFile} from "./StartupCommandsFile";
 
 export class ExtensionConfigFile {
     private readonly _path: string;
@@ -23,8 +24,8 @@ export class ExtensionConfigFile {
         let extensionConfigFile: string = filePath.readSync();
 
         let profileJson = JSON.parse(extensionConfigFile);
-        let {_id, _name, _startupFile, _aliasesFile, _pathsFile, _extensions} = profileJson;
-        let profile: ExtensionProfile = ExtensionProfile.restore(_id, _name, PathsFile.create(_pathsFile), StartupFile.create(_startupFile), AliasesFile.create(_aliasesFile), _extensions);
+        let {_id, _name, _startupFile, _aliasesFile, _pathsFile, _startupCommandsFile, _extensions} = profileJson;
+        let profile: ExtensionProfile = ExtensionProfile.restore(_id, _name, PathsFile.create(_pathsFile), StartupFile.create(_startupFile), AliasesFile.create(_aliasesFile), StartupCommandsFile.create(_startupCommandsFile), _extensions);
         return new ExtensionConfigFile(path, profile);
     }
 
