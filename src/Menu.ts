@@ -7,9 +7,9 @@ import {StartupFile} from "./StartupFile";
 import {AliasesFile} from "./AliasesFile";
 import * as  readlineSync from "readline-sync";
 import {ProfileNameDoesNotExist} from "./exceptions/ProfileNameDoesNotExist";
-import commandLineArgs = require('command-line-args');
 import {PathsFile} from "./PathsFile";
 import {Exception} from "./exceptions/Exception";
+import commandLineArgs = require('command-line-args');
 
 export class Menu {
 
@@ -55,19 +55,19 @@ export class Menu {
 
 
     private init(BASHRC_PATH: string, STARTSH_PATH: string): void {
-        const startShFile: StartShFile = StartShFile.create(STARTSH_PATH);
+        const startShFile: StartShFile = new StartShFile(STARTSH_PATH);
         startShFile.touch();
-        const bashRcFile: BashRcFile = BashRcFile.create(BASHRC_PATH);
+        const bashRcFile: BashRcFile = new BashRcFile(BASHRC_PATH);
         bashRcFile.appendSourceStart(STARTSH_PATH);
     }
 
     private list(DEFAULT_CONFIG_PATH: string): void {
-        let config: ConfigFile = ConfigFile.create(DEFAULT_CONFIG_PATH);
+        let config: ConfigFile = new ConfigFile(DEFAULT_CONFIG_PATH);
         config.printProfilesToConsole();
     }
 
     private newProfile(DEFAULT_CONFIG_PATH: string, STARTSH_PATH: string): void {
-        let config: ConfigFile = ConfigFile.create(DEFAULT_CONFIG_PATH);
+        let config: ConfigFile = new ConfigFile(DEFAULT_CONFIG_PATH);
         let profiles: Profile[] = config.profiles;
 
         let profileNameFromUser: string = readlineSync.question(`Profile name: `);
@@ -80,16 +80,16 @@ export class Menu {
         let newProfile: Profile = Profile.create(profileName);
 
         let startupPathFromUser: string = readlineSync.question(`Startup path: `);
-        const startupFile: StartupFile = StartupFile.create(startupPathFromUser);
+        const startupFile: StartupFile = new StartupFile(startupPathFromUser);
         newProfile.updateStartupPath(startupFile);
 
 
         let aliasesPathFromUser: string = readlineSync.question(`Aliases path: `);
-        const aliasesFile: AliasesFile = AliasesFile.create(aliasesPathFromUser);
+        const aliasesFile: AliasesFile = new AliasesFile(aliasesPathFromUser);
         newProfile.updateAliasesPath(aliasesFile);
 
         let pathsPathFromUser: string = readlineSync.question(`Paths path: `);
-        const pathsFile: PathsFile = PathsFile.create(pathsPathFromUser);
+        const pathsFile: PathsFile = new PathsFile(pathsPathFromUser);
         newProfile.updatePathsPath(pathsFile);
 
 
@@ -109,30 +109,30 @@ export class Menu {
 
         config.addProfile(newProfile);
 
-        config.writeToDisc();
-        startupFile.writeToDisc();
-        aliasesFile.writeToDisc();
+        config.write();
+        startupFile.write();
+        aliasesFile.write();
 
-        const startSh: StartShFile = StartShFile.create(STARTSH_PATH);
+        const startSh: StartShFile = new StartShFile(STARTSH_PATH);
         if (activeProfile == null) {
             return;
         }
-        startSh.refresh(activeProfile, STARTSH_PATH);
+        startSh.refresh(activeProfile);
     }
 
     private refresh(DEFAULT_CONFIG_PATH: string, STARTSH_PATH: string): void {
-        let config: ConfigFile = ConfigFile.create(DEFAULT_CONFIG_PATH);
+        let config: ConfigFile = new ConfigFile(DEFAULT_CONFIG_PATH);
         let activeProfile: Profile | null = config.getActive();
         if (activeProfile == null) {
             return;
         }
-        const startSh: StartShFile = StartShFile.create(STARTSH_PATH);
-        startSh.refresh(activeProfile, STARTSH_PATH);
+        const startSh: StartShFile = new StartShFile(STARTSH_PATH);
+        startSh.refresh(activeProfile);
     }
 
     private enableProfile(profileName: string, DEFAULT_CONFIG_PATH: string, STARTSH_PATH: string): void {
 
-        let config: ConfigFile = ConfigFile.create(DEFAULT_CONFIG_PATH);
+        let config: ConfigFile = new ConfigFile(DEFAULT_CONFIG_PATH);
         let profiles: Profile[] = config.profiles;
 
         let activeProfile: Profile | null = config.getActive();
@@ -151,12 +151,12 @@ export class Menu {
             throw new ProfileNameDoesNotExist();
         }
 
-        config.writeToDisc();
-        if (activeProfile == null){
+        config.write();
+        if (activeProfile == null) {
             return;
         }
-        const startSh: StartShFile = StartShFile.create(STARTSH_PATH);
-        startSh.refresh(activeProfile, STARTSH_PATH);
+        const startSh: StartShFile = new StartShFile(STARTSH_PATH);
+        startSh.refresh(activeProfile);
     }
 
     private help(): void {

@@ -1,49 +1,31 @@
-import * as fs from 'fs';
-import {FilePath} from "./FilePath";
-import {FilePathIsNotValidException} from "./exceptions/FilePathIsNotValidException";
+import {File} from "./File";
 
-export class AliasesFile {
-    private readonly _path: string|null;
+export class AliasesFile extends File {
     private readonly _aliases: Map<string, string>;
 
 
-    private constructor(path: string|null, startupPaths: Map<string, string>) {
-        this._path = path;
-        this._aliases = startupPaths;
-    }
+    constructor(path: string | null) {
+        super(path);
+        const aliasesFile: string = this.read();
 
-    static create(path: string | null): AliasesFile {
-        let filePath: FilePath = FilePath.create(path);
-        if (!filePath.isValid()) {
-            throw new FilePathIsNotValidException(path);
-        }
-        let aliasesFile: string = filePath.readSync();
-
-        let json = JSON.parse(aliasesFile);
-        let aliases: Map<string, string> = new Map<string, string>();
+        const json = JSON.parse(aliasesFile);
+        const aliases: Map<string, string> = new Map<string, string>();
         for (let key of Object.keys(json)) {
             aliases.set(key, json[key]);
         }
-        return new AliasesFile(path, aliases);
-    }
-
-    get path(): string|null {
-        return this._path;
+        this._aliases = aliases;
     }
 
     get aliases(): Map<string, string> {
         return this._aliases;
     }
 
-    writeToDisc() {
-        let aliasesAsObject: any = {};
+    write() {
+        const aliasesAsObject: any = {};
         this._aliases.forEach((value, key) => {
             aliasesAsObject[key] = value;
         });
-        let output: string = JSON.stringify(aliasesAsObject, null, 2);
-        // console.log('aliases--');
-        // console.log(output);
-        const aliasesFile: FilePath = FilePath.create(this.path);
-        aliasesFile.writeSync(output);
+        const output: string = JSON.stringify(aliasesAsObject, null, 2);
+        super.write(output);
     }
 }

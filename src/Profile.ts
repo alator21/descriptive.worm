@@ -22,10 +22,10 @@ export class Profile {
         this._name = name;
         this._isActive = isActive;
         this._ps1 = ps1;
-        this._pathsFile = (pathsPath && pathsPath.path) || null;
-        this._startupFile = (startupPath && startupPath.path) || null;
-        this._aliasesFile = (aliasesPath && aliasesPath.path) || null;
-        this._startupCommandsFile = (startupCommandsFile && startupCommandsFile.path) || null;
+        this._pathsFile = (pathsPath && pathsPath.filePath.path) || null;
+        this._startupFile = (startupPath && startupPath.filePath.path) || null;
+        this._aliasesFile = (aliasesPath && aliasesPath.filePath.path) || null;
+        this._startupCommandsFile = (startupCommandsFile && startupCommandsFile.filePath.path) || null;
         this._extensions = extensions;
     }
 
@@ -56,15 +56,15 @@ export class Profile {
     }
 
     updateStartupPath(startupPath: StartupFile): void {
-        this._startupFile = startupPath.path;
+        this._startupFile = startupPath.filePath.path;
     }
 
     updateAliasesPath(aliasesPath: AliasesFile): void {
-        this._aliasesFile = aliasesPath.path;
+        this._aliasesFile = aliasesPath.filePath.path;
     }
 
     updatePathsPath(pathsPath: PathsFile): void {
-        this._pathsFile = pathsPath.path;
+        this._pathsFile = pathsPath.filePath.path;
     }
 
 
@@ -98,12 +98,12 @@ export class Profile {
     // }
 
     static getStartupPaths(startupsFilePath: string | null, extensions: string[]): string[] {
-        let startupFile: StartupFile = StartupFile.create(startupsFilePath);
+        let startupFile: StartupFile = new StartupFile(startupsFilePath);
 
         let paths: string[] = startupFile.startupPaths;
 
         for (let extension of extensions) {
-            let extensionConfig: ExtensionConfigFile = ExtensionConfigFile.create(extension);
+            let extensionConfig: ExtensionConfigFile = new ExtensionConfigFile(extension);
             let extensionPathsFilePath = extensionConfig.profile.startupFile;
             let extensionExtensions = extensionConfig.profile.extensions;
             paths.push(...this.getStartupPaths(extensionPathsFilePath, extensionExtensions));
@@ -112,12 +112,12 @@ export class Profile {
     }
 
     static getPaths(pathsFilePath: string | null, extensions: string[]): string[] {
-        let pathsFile: PathsFile = PathsFile.create(pathsFilePath);
+        let pathsFile: PathsFile = new PathsFile(pathsFilePath);
 
         let paths: string[] = pathsFile.paths;
 
         for (let extension of extensions) {
-            let extensionConfig: ExtensionConfigFile = ExtensionConfigFile.create(extension);
+            let extensionConfig: ExtensionConfigFile = new ExtensionConfigFile(extension);
             let extensionPathsFilePath = extensionConfig.profile.pathsFile;
             let extensionExtensions = extensionConfig.profile.extensions;
             paths.push(...this.getPaths(extensionPathsFilePath, extensionExtensions));
@@ -126,11 +126,11 @@ export class Profile {
     }
 
     static getAliases(aliasesFilePath: string | null, extensions: string[]): Map<string, string> {
-        let aliasesFile: AliasesFile = AliasesFile.create(aliasesFilePath);
+        let aliasesFile: AliasesFile = new AliasesFile(aliasesFilePath);
 
         let aliases: Map<string, string> = aliasesFile.aliases;
         for (let extension of extensions) {
-            let extensionConfig: ExtensionConfigFile = ExtensionConfigFile.create(extension);
+            let extensionConfig: ExtensionConfigFile = new ExtensionConfigFile(extension);
             let extensionAliasesFilePath = extensionConfig.profile.aliasesFile;
             let extensionExtensions = extensionConfig.profile.extensions;
             this.getAliases(extensionAliasesFilePath, extensionExtensions).forEach((value, key) => {
@@ -141,12 +141,12 @@ export class Profile {
     }
 
     static getStartupCommands(startupCommandsFilePath: string | null, extensions: string[]): string[] {
-        let startupCommandsFile: StartupCommandsFile = StartupCommandsFile.create(startupCommandsFilePath);
+        let startupCommandsFile: StartupCommandsFile = new StartupCommandsFile(startupCommandsFilePath);
 
         let paths: string[] = startupCommandsFile.startupCommands;
 
         for (let extension of extensions) {
-            let extensionConfig: ExtensionConfigFile = ExtensionConfigFile.create(extension);
+            let extensionConfig: ExtensionConfigFile = new ExtensionConfigFile(extension);
             let extensionPathsFilePath = extensionConfig.profile.startupFile;
             let extensionExtensions = extensionConfig.profile.extensions;
             paths.push(...this.getStartupPaths(extensionPathsFilePath, extensionExtensions));

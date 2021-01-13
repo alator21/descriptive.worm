@@ -1,26 +1,12 @@
-import {FilePath} from "./FilePath";
-import {FilePathIsNotValidException} from "./exceptions/FilePathIsNotValidException";
+import {File} from "./File";
 
-export class BashRcFile {
-    private readonly _path: string;
-
-
-    private constructor(path: string) {
-        this._path = path;
-    }
-
-    static create(path: string): BashRcFile {
-        let filePath: FilePath = FilePath.create(path);
-        if (!filePath.isValid()) {
-            throw new FilePathIsNotValidException(path);
-        }
-
-        return new BashRcFile(path);
+export class BashRcFile extends File {
+    constructor(path: string) {
+        super(path);
     }
 
     private sourceStartExists(startShPath: string): boolean {
-        const bashRcFile = FilePath.create(this._path);
-        const bashRc = bashRcFile.readSync();
+        const bashRc: string = this.read();
         return bashRc.includes(`source ${startShPath}`);
     }
 
@@ -29,11 +15,7 @@ export class BashRcFile {
             console.warn(`Already initialized.`);
             return;
         }
-        let filePath: FilePath = FilePath.create(this._path);
-        filePath.appendSync(startShPath);
+        this.append(startShPath);
     }
 
-    get path(): string {
-        return this._path;
-    }
 }

@@ -1,6 +1,6 @@
 import {Exception} from "./Exception";
 
-export class StartupFileWrongFormatException  extends Exception{
+export class StartupFileWrongFormatException extends Exception {
 
 
     toString() {

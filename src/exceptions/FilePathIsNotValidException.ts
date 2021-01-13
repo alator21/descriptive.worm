@@ -1,10 +1,10 @@
 import {Exception} from "./Exception";
 
 export class FilePathIsNotValidException extends Exception {
-    private readonly _path: string|null;
+    private readonly _path: string | null;
 
 
-    constructor(path: string|null) {
+    constructor(path: string | null) {
         super();
         this._path = path;
     }
