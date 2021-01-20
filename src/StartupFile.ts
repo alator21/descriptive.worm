@@ -26,6 +26,13 @@ export class StartupFile extends File {
         this._startupPaths = startupPaths;
     }
 
+    static empty(path: string): StartupFile {
+        let fp: FilePath = FilePath.create(path);
+        fp.touch();
+        fp.appendSync('[\n\n]')
+        return new StartupFile(path)
+    }
+
     get startupPaths(): string[] {
         return this._startupPaths;
     }

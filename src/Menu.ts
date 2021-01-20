@@ -9,16 +9,18 @@ import * as  readlineSync from "readline-sync";
 import {ProfileNameDoesNotExist} from "./exceptions/ProfileNameDoesNotExist";
 import {PathsFile} from "./PathsFile";
 import {Exception} from "./exceptions/Exception";
+import {StartupCommandsFile} from "./StartupCommandsFile";
 import commandLineArgs = require('command-line-args');
 
 export class Menu {
 
 
-    private constructor(BASHRC_PATH: string, STARTSH_PATH: string, DEFAULT_CONFIG_PATH: string) {
+    private constructor(BASHRC_PATH: string, STARTSH_PATH: string, DEFAULT_CONFIG_PATH: string, DEFAULT_PROFILES_PATH: string) {
         const optionDefinitions = [
             {name: `init`, alias: `i`, type: Boolean},
             {name: `list`, alias: `l`, type: Boolean},
             {name: `new-profile`, alias: `n`, type: Boolean},
+            {name: `new-empty`, type: Boolean},
             {name: `refresh`, alias: `r`, type: Boolean},
             {name: `enable`, alias: `e`, type: String},
             {name: `help`, alias: `h`, type: Boolean}
@@ -32,6 +34,8 @@ export class Menu {
                 this.list(DEFAULT_CONFIG_PATH);
             } else if (options[`new-profile`]) {
                 this.newProfile(DEFAULT_CONFIG_PATH, STARTSH_PATH);
+            } else if (options[`new-empty`]) {
+                this.newEmptyProfile(DEFAULT_CONFIG_PATH, STARTSH_PATH, DEFAULT_PROFILES_PATH);
             } else if (options['refresh']) {
                 this.refresh(DEFAULT_CONFIG_PATH, STARTSH_PATH);
             } else if (options['enable']) {
@@ -49,8 +53,8 @@ export class Menu {
         }
     }
 
-    static create(BASHRC_PATH: string, STARTSH_PATH: string, DEFAULT_CONFIG_PATH: string): Menu {
-        return new Menu(BASHRC_PATH, STARTSH_PATH, DEFAULT_CONFIG_PATH);
+    static create(BASHRC_PATH: string, STARTSH_PATH: string, DEFAULT_CONFIG_PATH: string, DEFAULT_PROFILES_PATH: string): Menu {
+        return new Menu(BASHRC_PATH, STARTSH_PATH, DEFAULT_CONFIG_PATH, DEFAULT_PROFILES_PATH);
     }
 
 
@@ -118,6 +122,29 @@ export class Menu {
             return;
         }
         startSh.refresh(activeProfile);
+    }
+
+    private newEmptyProfile(DEFAULT_CONFIG_PATH: string, STARTSH_PATH: string, DEFAULT_PROFILES_PATH: string) {
+        let config: ConfigFile = new ConfigFile(DEFAULT_CONFIG_PATH);
+        let profiles: Profile[] = config.profiles;
+
+        let profileNameFromUser: string = readlineSync.question(`Profile name: `);
+        const profileName: string = profileNameFromUser.trim();
+        for (let prof of profiles) {
+            if (prof.name === profileName) {
+                throw new ProfileNameAlreadyExists();
+            }
+        }
+        let profilePath:string = `${DEFAULT_PROFILES_PATH}/${profileName}`;
+
+        let newProfile: Profile = Profile.create(profileName);
+        newProfile.updatePathsPath(PathsFile.empty(`${profilePath}/paths.json`));
+        newProfile.updateStartupPath(StartupFile.empty(`${profilePath}/startup.json`));
+        newProfile.updateAliasesPath(AliasesFile.empty(`${profilePath}/aliases.json`));
+        newProfile.updateStartupCommandsPath(StartupCommandsFile.empty(`${profilePath}/startup-commands.json`));
+        config.addProfile(newProfile);
+
+        config.write();
     }
 
     private refresh(DEFAULT_CONFIG_PATH: string, STARTSH_PATH: string): void {

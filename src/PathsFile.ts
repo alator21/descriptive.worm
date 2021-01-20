@@ -1,5 +1,6 @@
 import {PathFileWrongFormatException} from "./exceptions/PathFileWrongFormatException";
 import {File} from "./File";
+import {FilePath} from "./FilePath";
 
 export class PathsFile extends File {
     private readonly _paths: string[];
@@ -23,6 +24,13 @@ export class PathsFile extends File {
 
     get paths(): string[] {
         return this._paths;
+    }
+
+    static empty(path: string): PathsFile {
+        let fp: FilePath = FilePath.create(path);
+        fp.touch();
+        fp.appendSync('[\n\n]')
+        return new PathsFile(path)
     }
 
     writeToDisc() {

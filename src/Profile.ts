@@ -67,6 +67,10 @@ export class Profile {
         this._pathsFile = pathsPath.filePath.path;
     }
 
+    updateStartupCommandsPath(startupCommandsPath: StartupCommandsFile): void {
+        this._startupCommandsFile = startupCommandsPath.filePath.path;
+    }
+
 
     // addExtension(profile: Profile): void {
     //     if (this.extensionExist(profile.id)) {

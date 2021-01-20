@@ -1,4 +1,5 @@
 import {File} from "./File";
+import {FilePath} from "./FilePath";
 
 export class AliasesFile extends File {
     private readonly _aliases: Map<string, string>;
@@ -16,6 +17,12 @@ export class AliasesFile extends File {
         this._aliases = aliases;
     }
 
+    static empty(path: string): AliasesFile {
+        let fp: FilePath = FilePath.create(path);
+        fp.touch();
+        fp.appendSync('{\n\n}')
+        return new AliasesFile(path)
+    }
     get aliases(): Map<string, string> {
         return this._aliases;
     }

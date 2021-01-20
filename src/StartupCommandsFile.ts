@@ -1,5 +1,6 @@
 import {StartupFileWrongFormatException} from "./exceptions/StartupFileWrongFormatException";
 import {File} from "./File";
+import {FilePath} from "./FilePath";
 
 export class StartupCommandsFile extends File {
     private readonly _startupCommands: string[];
@@ -14,6 +15,13 @@ export class StartupCommandsFile extends File {
             throw new StartupFileWrongFormatException();
         }
         this._startupCommands = startupCommands;
+    }
+
+    static empty(path: string): StartupCommandsFile {
+        let fp: FilePath = FilePath.create(path);
+        fp.touch();
+        fp.appendSync('[\n\n]')
+        return new StartupCommandsFile(path)
     }
 
     get startupCommands(): string[] {
