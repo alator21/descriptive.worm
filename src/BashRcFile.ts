@@ -15,7 +15,7 @@ export class BashRcFile extends File {
             console.warn(`Already initialized.`);
             return;
         }
-        this.append(startShPath);
+        this.append(`\nsource ${startShPath}`);
     }
 
 }
