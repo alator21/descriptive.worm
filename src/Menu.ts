@@ -21,6 +21,7 @@ export class Menu {
             {name: `list`, alias: `l`, type: Boolean},
             {name: `new-profile`, alias: `n`, type: Boolean},
             {name: `new-empty`, type: Boolean},
+            {name: `add-extension`, multiple: true, type: String},
             {name: `refresh`, alias: `r`, type: Boolean},
             {name: `enable`, alias: `e`, type: String},
             {name: `help`, alias: `h`, type: Boolean}
@@ -36,6 +37,8 @@ export class Menu {
                 this.newProfile(DEFAULT_CONFIG_PATH, STARTSH_PATH);
             } else if (options[`new-empty`]) {
                 this.newEmptyProfile(DEFAULT_CONFIG_PATH, STARTSH_PATH, DEFAULT_PROFILES_PATH);
+            } else if (options[`add-extension`]) {
+                this.addExtensionToProfile(DEFAULT_CONFIG_PATH, STARTSH_PATH, options['add-extension']);
             } else if (options['refresh']) {
                 this.refresh(DEFAULT_CONFIG_PATH, STARTSH_PATH);
             } else if (options['enable']) {
@@ -135,7 +138,7 @@ export class Menu {
                 throw new ProfileNameAlreadyExists();
             }
         }
-        let profilePath:string = `${DEFAULT_PROFILES_PATH}/${profileName}`;
+        let profilePath: string = `${DEFAULT_PROFILES_PATH}/${profileName}`;
 
         let newProfile: Profile = Profile.create(profileName);
         newProfile.updatePathsPath(PathsFile.empty(`${profilePath}/paths.json`));
@@ -145,6 +148,22 @@ export class Menu {
         config.addProfile(newProfile);
 
         config.write();
+    }
+
+    private addExtensionToProfile(DEFAULT_CONFIG_PATH: string, STARTSH_PATH: string, options: [string, string]) {
+        const profileName: string = options[0];
+        const extensionPath: string = options[1];
+        let config: ConfigFile = new ConfigFile(DEFAULT_CONFIG_PATH);
+        const profile: Profile | undefined = config.profiles.find(profile => {
+            return profile.name === profileName
+        })
+        if (profile == null) {
+            return;
+        }
+        profile.addExtension(extensionPath);
+
+        config.write();
+        this.refresh(DEFAULT_CONFIG_PATH, STARTSH_PATH);
     }
 
     private refresh(DEFAULT_CONFIG_PATH: string, STARTSH_PATH: string): void {
