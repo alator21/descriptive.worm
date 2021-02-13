@@ -1,37 +1,27 @@
-import {FilePath} from "./FilePath";
 import {StartupFile} from "./StartupFile";
 import {AliasesFile} from "./AliasesFile";
-import {FilePathIsNotValidException} from "./exceptions/FilePathIsNotValidException";
 import {PathsFile} from "./PathsFile";
 import {ExtensionProfile} from "./ExtensionProfile";
 import {StartupCommandsFile} from "./StartupCommandsFile";
+import {File} from "./File";
 
-export class ExtensionConfigFile {
-    private readonly _path: string;
+export class ExtensionConfigFile extends File {
     private readonly _profile: ExtensionProfile;
 
 
-    private constructor(path: string, profile: ExtensionProfile) {
-        this._path = path;
-        this._profile = profile;
-    }
-
-    static create(path: string): ExtensionConfigFile {
-        let filePath: FilePath = FilePath.create(path);
-        if (!filePath.isValid()) {
-            throw new FilePathIsNotValidException(path);
-        }
-        let extensionConfigFile: string = filePath.readSync();
+    constructor(path: string) {
+        super(path);
+        let extensionConfigFile: string = this.read();
 
         let profileJson = JSON.parse(extensionConfigFile);
         let {_id, _name, _startupFile, _aliasesFile, _pathsFile, _startupCommandsFile, _extensions} = profileJson;
-        let profile: ExtensionProfile = ExtensionProfile.restore(_id, _name, PathsFile.create(_pathsFile), StartupFile.create(_startupFile), AliasesFile.create(_aliasesFile), StartupCommandsFile.create(_startupCommandsFile), _extensions);
-        return new ExtensionConfigFile(path, profile);
-    }
-
-
-    get path(): string {
-        return this._path;
+        this._profile = ExtensionProfile.restore(
+            _id, _name,
+            new PathsFile(_pathsFile),
+            new StartupFile(_startupFile),
+            new AliasesFile(_aliasesFile),
+            new StartupCommandsFile(_startupCommandsFile),
+            _extensions);
     }
 
     get profile(): ExtensionProfile {

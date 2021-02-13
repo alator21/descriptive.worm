@@ -16,10 +16,10 @@ export class ExtensionProfile {
     private constructor(id: string, name: string, pathsPath: PathsFile | null, startupPath: StartupFile | null, aliasesPath: AliasesFile | null, startupCommandsFile: StartupCommandsFile | null, extensions: string[]) {
         this._id = id;
         this._name = name;
-        this._pathsFile = (pathsPath && pathsPath.path) || null;
-        this._startupFile = (startupPath && startupPath.path) || null;
-        this._aliasesFile = (aliasesPath && aliasesPath.path) || null;
-        this._startupCommandsFile = (startupCommandsFile && startupCommandsFile.path) || null;
+        this._pathsFile = (pathsPath && pathsPath.filePath.path) || null;
+        this._startupFile = (startupPath && startupPath.filePath.path) || null;
+        this._aliasesFile = (aliasesPath && aliasesPath.filePath.path) || null;
+        this._startupCommandsFile = (startupCommandsFile && startupCommandsFile.filePath.path) || null;
         this._extensions = extensions;
     }
 

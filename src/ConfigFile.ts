@@ -1,51 +1,67 @@
 import {Profile} from "./Profile";
-import {FilePath} from "./FilePath";
 import {StartupFile} from "./StartupFile";
 import {AliasesFile} from "./AliasesFile";
 import {table} from 'table';
 import {PathsFile} from "./PathsFile";
 import {ConfigFileWrongFormatException} from "./exceptions/ConfigFileWrongFormatException";
 import {StartupCommandsFile} from "./StartupCommandsFile";
+import {File} from "./File";
+import {FilePathIsNotValidException} from "./exceptions/FilePathIsNotValidException";
 
 const chalk = require('chalk');
 
-export class ConfigFile {
-    private readonly _path: string | null;
+export class ConfigFile extends File {
     private readonly _profiles: Profile[];
 
 
-    private constructor(path: string | null, profiles: Profile[]) {
-        this._path = path;
-        this._profiles = profiles;
-    }
-
-    static create(path: string): ConfigFile {
-        let filePath: FilePath = FilePath.create(path);
-        if (!filePath.isValid()) {
-            filePath.touch();
-        }
-        let configFile: string = filePath.readSync();
-
+    constructor(path: string | null) {
         try {
-            let json = JSON.parse(configFile);
-            let profiles: Profile[] = []
-            for (let key of Object.keys(json)) {
-                let profileJson = json[key];
-                let {_id, _name, _startupFile, _aliasesFile, _isActive, _ps1, _pathsFile, _startupCommandsFile, _extensions} = profileJson;
-                profiles.push(
-                    Profile.restore(_id, _name, _isActive, _ps1, PathsFile.create(_pathsFile), StartupFile.create(_startupFile), AliasesFile.create(_aliasesFile), StartupCommandsFile.create(_startupCommandsFile), _extensions
-                    )
-                );
+            super(path);
+        } catch (e) {
+            if (e instanceof FilePathIsNotValidException) {
+                this.filePath.touch();
             }
+        } finally {
+            let configFile: string = this.read();
 
-            return new ConfigFile(path, profiles);
-        } catch (exception) {
-            if (exception instanceof SyntaxError) {
-                throw new ConfigFileWrongFormatException();
+            try {
+                let json = JSON.parse(configFile);
+                let profiles: Profile[] = []
+                for (let key of Object.keys(json)) {
+                    let profileJson = json[key];
+                    let {
+                        _id,
+                        _name,
+                        _startupFile,
+                        _aliasesFile,
+                        _isActive,
+                        _ps1,
+                        _pathsFile,
+                        _startupCommandsFile,
+                        _extensions
+                    } = profileJson;
+                    profiles.push(
+                        Profile.restore(
+                            _id,
+                            _name,
+                            _isActive,
+                            _ps1,
+                            new PathsFile(_pathsFile),
+                            new StartupFile(_startupFile),
+                            new AliasesFile(_aliasesFile),
+                            new StartupCommandsFile(_startupCommandsFile),
+                            _extensions
+                        )
+                    );
+                }
+                this._profiles = profiles;
+            } catch (exception) {
+                if (exception instanceof SyntaxError) {
+                    throw new ConfigFileWrongFormatException();
+                }
+                throw exception;
             }
-            throw exception;
         }
-
     }
 
 
@@ -77,20 +93,13 @@ export class ConfigFile {
     }
 
 
-    get path(): string | null {
-        return this._path;
-    }
-
     get profiles(): Profile[] {
         return this._profiles;
     }
 
-    writeToDisc() {
+    write() {
         let output: string = JSON.stringify(this.profiles, null, 2);
-        // console.log('config--');
-        // console.log(output);
-        const configFile: FilePath = FilePath.create(this._path);
-        configFile.writeSync(output);
+        super.write(output);
     }
 
     printProfilesToConsole() {

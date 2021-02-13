@@ -1,24 +1,14 @@
-import * as fs from 'fs';
-import {FilePath} from "./FilePath";
-import {FilePathIsNotValidException} from "./exceptions/FilePathIsNotValidException";
 import {PathFileWrongFormatException} from "./exceptions/PathFileWrongFormatException";
+import {File} from "./File";
+import {FilePath} from "./FilePath";
 
-export class PathsFile {
-    private readonly _path: string|null;
+export class PathsFile extends File {
     private readonly _paths: string[];
 
 
-    private constructor(path: string|null, startupPaths: string[]) {
-        this._path = path;
-        this._paths = startupPaths;
-    }
-
-    static create(path: string | null): PathsFile {
-        let filePath: FilePath = FilePath.create(path);
-        if (!filePath.isValid()) {
-            throw new FilePathIsNotValidException(path);
-        }
-        let pathFile: string = filePath.readSync();
+    constructor(path: string | null) {
+        super(path);
+        let pathFile: string = this.read();
 
         let paths: any[] = JSON.parse(pathFile);
         if (!Array.isArray(paths)) {
@@ -29,23 +19,22 @@ export class PathsFile {
                 throw new PathFileWrongFormatException();
             }
         }
-        return new PathsFile(path, paths);
-    }
-
-
-    get path(): string |null{
-        return this._path;
+        this._paths = paths;
     }
 
     get paths(): string[] {
         return this._paths;
     }
 
+    static empty(path: string): PathsFile {
+        let fp: FilePath = FilePath.create(path);
+        fp.touch();
+        fp.appendSync('[\n\n]')
+        return new PathsFile(path)
+    }
+
     writeToDisc() {
         let output: string = JSON.stringify(this._paths, null, 2);
-        // console.log('path--');
-        // console.log(output);
-        const pathsFile: FilePath = FilePath.create(this._path);
-        pathsFile.writeSync(output);
+        this.write(output);
     }
 }

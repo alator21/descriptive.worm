@@ -1,6 +1,5 @@
 export abstract class Exception {
 
 
-
-    abstract toString():string;
+    abstract toString(): string;
 }

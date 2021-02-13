@@ -3,13 +3,13 @@ import * as fs from 'fs';
 const expandHomeDir = require('expand-home-dir');
 
 export class FilePath {
-    private readonly path: string | null;
-    private readonly expandedPath: string | null;
+    private readonly _path: string | null;
+    private readonly _expandedPath: string | null;
 
 
     private constructor(path: string | null) {
-        this.path = path;
-        this.expandedPath = expandHomeDir(path);
+        this._path = path;
+        this._expandedPath = expandHomeDir(path);
     }
 
     static create(path: string | null): FilePath {
@@ -17,38 +17,47 @@ export class FilePath {
     }
 
     isValid(): boolean {
-        if (this.expandedPath == null) {
+        if (this._expandedPath == null) {
             return false;
         }
-        return fs.existsSync(this.expandedPath);
+        return fs.existsSync(this._expandedPath);
     }
 
     readSync(): string {
-        if (this.expandedPath == null) {
+        if (this._expandedPath == null) {
             throw new Error('');
         }
-        return fs.readFileSync(this.expandedPath, 'utf8');
+        return fs.readFileSync(this._expandedPath, 'utf8');
     }
 
     touch(): void {
-        if (this.expandedPath == null) {
+        if (this._expandedPath == null) {
             throw new Error('');
         }
-        FilePath.writeFileSyncRecursive(this.expandedPath, '');
+        FilePath.writeFileSyncRecursive(this._expandedPath, '');
     }
 
     writeSync(data: string): void {
-        if (this.expandedPath == null) {
+        if (this._expandedPath == null) {
             throw new Error('');
         }
-        FilePath.writeFileSyncRecursive(this.expandedPath, data);
+        FilePath.writeFileSyncRecursive(this._expandedPath, data);
     }
 
     appendSync(data: string): void {
-        if (this.expandedPath == null) {
+        if (this._expandedPath == null) {
             throw new Error('');
         }
-        fs.appendFileSync(this.expandedPath, data)
+        fs.appendFileSync(this._expandedPath, data)
+    }
+
+
+    get path(): string | null {
+        return this._path;
+    }
+
+    get expandedPath(): string | null {
+        return this._expandedPath;
     }
 
     private static writeFileSyncRecursive(filename: string, content: string): void {

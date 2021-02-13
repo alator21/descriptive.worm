@@ -1,39 +1,21 @@
-import * as fs from 'fs';
 import {FilePath} from "./FilePath";
 import {FilePathIsNotValidException} from "./exceptions/FilePathIsNotValidException";
 import {Profile} from "./Profile";
+import {File} from "./File";
 
-export class StartShFile {
-    private readonly _path: string;
-
-
-    private constructor(path: string) {
-        this._path = path;
-    }
-
-    static create(path: string): StartShFile {
-        let filePath: FilePath = FilePath.create(path);
-        if (!filePath.isValid()) {
-            filePath.touch();
+export class StartShFile extends File {
+    constructor(path: string) {
+        try {
+            super(path);
+        } catch (e) {
+            if (e instanceof FilePathIsNotValidException) {
+                this.filePath.touch();
+            }
         }
-        return new StartShFile(path);
-    }
-
-    private exists(): boolean {
-        return fs.existsSync(this._path);
-    }
-
-    touch(): void {
-        if (this.exists()) {
-            console.warn(`Start.sh already exists`);
-            return;
-        }
-        const startShFile: FilePath = FilePath.create(this._path);
-        startShFile.writeSync('');
     }
 
 
-    refresh(profile: Profile, STARTSH_PATH: string): void {
+    refresh(profile: Profile): void {
         if (profile == null) {
             console.warn(`No active profile selected.`);
             return;
@@ -59,8 +41,7 @@ export class StartShFile {
 
         let ps1: string | null = profile.ps1;
 
-        const startShFile: StartShFile = StartShFile.create(STARTSH_PATH);
-        startShFile.update(startupPaths, aliases, paths, startupCommands, ps1);
+        this.update(startupPaths, aliases, paths, startupCommands, ps1);
     }
 
     update(startups: string[], aliases: Map<string, string>, paths: string[], startupCommands: string[], ps1: string | null): void {
@@ -109,12 +90,6 @@ export class StartShFile {
         output += `\n`;
 
 
-        const startShFile: FilePath = FilePath.create(this._path);
-        startShFile.writeSync(output);
+        this.write(output);
     }
-
-    get path(): string {
-        return this._path;
-    }
-
 }
