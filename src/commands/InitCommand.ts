@@ -5,15 +5,15 @@ import {BashRcFile} from "../file/BashRcFile";
 
 export class InitCommand extends Command {
 
-    constructor() {
-        super();
-    }
+	constructor() {
+		super();
+	}
 
-    execute(): void {
-        new StartShFile(STARTSH_PATH, true);
-        const bashRcFile: BashRcFile = new BashRcFile(BASHRC_PATH);
-        bashRcFile.config();
-    }
+	execute(): void {
+		new StartShFile(STARTSH_PATH, true);
+		const bashRcFile: BashRcFile = new BashRcFile(BASHRC_PATH);
+		bashRcFile.config();
+	}
 
 
 }

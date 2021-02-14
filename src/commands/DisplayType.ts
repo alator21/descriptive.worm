@@ -1,4 +1,4 @@
-export enum DisplayType{
-    SIMPLE,
-    FULL
+export enum DisplayType {
+	SIMPLE,
+	FULL
 }
