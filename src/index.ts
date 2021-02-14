@@ -9,6 +9,7 @@ import {Exception} from "./exceptions/Exception";
 import {ListProfilesCommand} from "./commands/ListProfilesCommand";
 import {InitCommand} from "./commands/InitCommand";
 import {SystemFolder} from "./folder/SystemFolder";
+import {DisplayType} from "./commands/DisplayType";
 
 const {Command} = require('commander');
 
@@ -23,23 +24,12 @@ program.version('0.0.1');
 
 program
     .option('-r, --refresh', 'refresh configuration')
-    .option('-l, --list', 'list profiles')
     .action((options: any) => {
         if (options['refresh'] === true) {
             refreshStartSh();
-        } else if (options['list'] === true) {
-            const listProfilesCommand: ListProfilesCommand = new ListProfilesCommand();
-            try {
-                listProfilesCommand.execute();
-            } catch (e) {
-                if (e instanceof Exception) {
-                    console.log(e.toString());
-                    return;
-                }
-                console.log(e);
-            }
         }
     })
+
 
 program
     .command('init')
@@ -57,6 +47,26 @@ program
         }
     })
 
+program
+    .command('list')
+    .description('lists profiles')
+    .option('-s, --simple')
+    .action((options: any) => {
+        let displayType: DisplayType = DisplayType.FULL;
+        if (options.simple) {
+            displayType = DisplayType.SIMPLE;
+        }
+        const listProfilesCommand: ListProfilesCommand = new ListProfilesCommand(displayType);
+        try {
+            listProfilesCommand.execute();
+        } catch (e) {
+            if (e instanceof Exception) {
+                console.log(e.toString());
+                return;
+            }
+            console.log(e);
+        }
+    })
 
 const profileCommand = program
     .command('profile');

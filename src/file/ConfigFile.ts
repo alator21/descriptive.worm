@@ -92,7 +92,7 @@ export class ConfigFile extends SystemFile {
         super.writeSync(output);
     }
 
-    printProfilesToConsole() {
+    printProfilesFull() {
         let output: any[] = [];
         for (let profile of this._profiles.values()) {
             output.push({
@@ -104,6 +104,19 @@ export class ConfigFile extends SystemFile {
                 'aliases': chalk.yellow(profile.aliasesFile),
                 'startup-commands': chalk.yellow(profile.startupCommandsFile),
                 'extensions': chalk.magenta(profile.extensions.join(',')),
+                'active': chalk.cyan(profile.isActive)
+            });
+        }
+        ConfigFile.printTable(output, {
+            headerStyleFn: (header: any) => chalk.bold(chalk.red(header))
+        });
+    }
+
+    printProfilesSimple() {
+        let output: any[] = [];
+        for (let profile of this._profiles.values()) {
+            output.push({
+                'name': chalk.yellow(profile.name),
                 'active': chalk.cyan(profile.isActive)
             });
         }
