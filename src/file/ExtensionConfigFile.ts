@@ -1,11 +1,11 @@
+import {SystemFile} from "./SystemFile";
+import {ExtensionProfile} from "../ExtensionProfile";
+import {PathsFile} from "./PathsFile";
 import {StartupFile} from "./StartupFile";
 import {AliasesFile} from "./AliasesFile";
-import {PathsFile} from "./PathsFile";
-import {ExtensionProfile} from "./ExtensionProfile";
 import {StartupCommandsFile} from "./StartupCommandsFile";
-import {File} from "./File";
 
-export class ExtensionConfigFile extends File {
+export class ExtensionConfigFile extends SystemFile {
     private readonly _profile: ExtensionProfile;
 
 

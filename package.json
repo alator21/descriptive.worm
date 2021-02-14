@@ -1,20 +1,21 @@
 {
   "name": "nbasz",
-  "version": "1.0.0",
+  "version": "0.0.1",
   "description": "",
   "main": "src/index.ts",
   "scripts": {
     "start": "ts-node src/index.ts",
-    "build": "tsc && pkg --target linux --output nb dist/index.js "
+    "build": "tsc && pkg --target linux --output dworm dist/index.js "
   },
   "keywords": [],
   "author": "Rafael Triantafillidis",
   "license": "ISC",
   "dependencies": {
     "chalk": "^4.0.0",
-    "command-line-args": "^5.1.1",
+    "commander": "^7.0.0",
     "dotenv": "^8.2.0",
     "expand-home-dir": "0.0.3",
+    "inquirer": "^7.3.3",
     "readline-sync": "^1.4.10",
     "table": "^5.4.6",
     "uuid": "^7.0.3"
@@ -22,6 +23,7 @@
   "devDependencies": {
     "@types/chalk": "^2.2.0",
     "@types/command-line-args": "^5.0.0",
+    "@types/inquirer": "^7.3.1",
     "@types/node": "^13.13.4",
     "@types/readline-sync": "^1.4.3",
     "@types/table": "^5.0.0",

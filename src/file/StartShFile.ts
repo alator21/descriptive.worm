@@ -1,16 +1,13 @@
-import {FilePath} from "./FilePath";
-import {FilePathIsNotValidException} from "./exceptions/FilePathIsNotValidException";
-import {Profile} from "./Profile";
-import {File} from "./File";
+import {SystemFile} from "./SystemFile";
+import {FilePathIsNotValidException} from "../exceptions/FilePathIsNotValidException";
+import {Profile} from "../Profile";
 
-export class StartShFile extends File {
-    constructor(path: string) {
-        try {
-            super(path);
-        } catch (e) {
-            if (e instanceof FilePathIsNotValidException) {
-                this.filePath.touch();
-            }
+export class StartShFile extends SystemFile {
+
+    constructor(path: string,touch?:boolean) {
+        super(path);
+        if (touch){
+            this.touch();
         }
     }
 
@@ -26,18 +23,18 @@ export class StartShFile extends File {
         const pathsFilePath: string | null = profile.pathsFile;
         const extensions: string[] = profile.extensions
             .map(extension => {
-                const filePath: FilePath = FilePath.create(extension);
-                if (!filePath.isValid()) {
+                const extensionFile: SystemFile = new SystemFile(extension);
+                if (!extensionFile.isFile()) {
                     throw new FilePathIsNotValidException(extension);
                 }
                 return extension;
             });
 
 
-        const startupPaths: string[] = Profile.getStartupPaths(startupsFilePath, extensions);
-        const startupCommands: string[] = Profile.getStartupCommands(startupCommandsFilePath, extensions);
-        const aliases: Map<string, string> = Profile.getAliases(aliasesFilePath, extensions);
-        const paths: string[] = Profile.getPaths(pathsFilePath, extensions);
+        const startupPaths: string[] = Profile.calculateStartupPaths(startupsFilePath, extensions);
+        const startupCommands: string[] = Profile.calculateStartupCommands(startupCommandsFilePath, extensions);
+        const aliases: Map<string, string> = Profile.calculateAliases(aliasesFilePath, extensions);
+        const paths: string[] = Profile.calculatePaths(pathsFilePath, extensions);
 
         let ps1: string | null = profile.ps1;
 
@@ -90,6 +87,6 @@ export class StartShFile extends File {
         output += `\n`;
 
 
-        this.write(output);
+        this.writeSync(output);
     }
 }

@@ -1,9 +1,9 @@
 import {v4 as uuidv4} from 'uuid';
-import {StartupFile} from "./StartupFile";
-import {AliasesFile} from "./AliasesFile";
-import {PathsFile} from "./PathsFile";
-import {ExtensionConfigFile} from "./ExtensionConfigFile";
-import {StartupCommandsFile} from "./StartupCommandsFile";
+import {PathsFile} from "./file/PathsFile";
+import {StartupFile} from "./file/StartupFile";
+import {AliasesFile} from "./file/AliasesFile";
+import {StartupCommandsFile} from "./file/StartupCommandsFile";
+import {ExtensionConfigFile} from "./file/ExtensionConfigFile";
 
 export class Profile {
     private readonly _id: string;
@@ -22,10 +22,10 @@ export class Profile {
         this._name = name;
         this._isActive = isActive;
         this._ps1 = ps1;
-        this._pathsFile = (pathsPath && pathsPath.filePath.path) || null;
-        this._startupFile = (startupPath && startupPath.filePath.path) || null;
-        this._aliasesFile = (aliasesPath && aliasesPath.filePath.path) || null;
-        this._startupCommandsFile = (startupCommandsFile && startupCommandsFile.filePath.path) || null;
+        this._pathsFile = (pathsPath && pathsPath.path) || null;
+        this._startupFile = (startupPath && startupPath.path) || null;
+        this._aliasesFile = (aliasesPath && aliasesPath.path) || null;
+        this._startupCommandsFile = (startupCommandsFile && startupCommandsFile.path) || null;
         this._extensions = extensions;
     }
 
@@ -35,7 +35,16 @@ export class Profile {
         return new Profile(id, name, false, null, null, null, null, null, []);
     }
 
-    static restore(id: string, name: string, isActive: boolean, ps1: string | null, pathsPath: PathsFile | null, startupPath: StartupFile | null, aliasesPath: AliasesFile | null, startupCommandsFile: StartupCommandsFile | null, extensions: string[]): Profile {
+    static restore(
+        id: string,
+        name: string,
+        isActive: boolean,
+        ps1: string | null,
+        pathsPath: PathsFile,
+        startupPath: StartupFile | null,
+        aliasesPath: AliasesFile | null,
+        startupCommandsFile: StartupCommandsFile | null,
+        extensions: string[]): Profile {
         return new Profile(id, name, isActive, ps1, pathsPath, startupPath, aliasesPath, startupCommandsFile, extensions);
     }
 
@@ -56,27 +65,28 @@ export class Profile {
     }
 
     updateStartupPath(startupPath: StartupFile): void {
-        this._startupFile = startupPath.filePath.path;
+        this._startupFile = startupPath.path;
     }
 
     updateAliasesPath(aliasesPath: AliasesFile): void {
-        this._aliasesFile = aliasesPath.filePath.path;
+        this._aliasesFile = aliasesPath.path;
     }
 
     updatePathsPath(pathsPath: PathsFile): void {
-        this._pathsFile = pathsPath.filePath.path;
+        this._pathsFile = pathsPath.path;
     }
 
     updateStartupCommandsPath(startupCommandsPath: StartupCommandsFile): void {
-        this._startupCommandsFile = startupCommandsPath.filePath.path;
+        this._startupCommandsFile = startupCommandsPath.path;
     }
 
-    addExtension(extensionPath: string) {
-        if (this._extensions.includes(extensionPath)){
-            return;
-        }
-        this._extensions.push(extensionPath);
-    }
+    //
+    // addExtension(extensionPath: string) {
+    //     if (this._extensions.includes(extensionPath)){
+    //         return;
+    //     }
+    //     this._extensions.push(extensionPath);
+    // }
 
 
     // addExtension(profile: Profile): void {
@@ -108,59 +118,60 @@ export class Profile {
     //     return false;
     // }
 
-    static getStartupPaths(startupsFilePath: string | null, extensions: string[]): string[] {
-        let startupFile: StartupFile = new StartupFile(startupsFilePath);
+    static calculateStartupPaths(startupsFilePath: string | null, extensions: string[]): string[] {
+        const startupFile: StartupFile | null = ((startupsFilePath != null) && new StartupFile(startupsFilePath)) || null;
 
-        let paths: string[] = startupFile.startupPaths;
+        const paths: string[] = (startupFile && startupFile.startupPaths) || [];
 
         for (let extension of extensions) {
             let extensionConfig: ExtensionConfigFile = new ExtensionConfigFile(extension);
             let extensionPathsFilePath = extensionConfig.profile.startupFile;
             let extensionExtensions = extensionConfig.profile.extensions;
-            paths.push(...this.getStartupPaths(extensionPathsFilePath, extensionExtensions));
+            paths.push(...this.calculateStartupPaths(extensionPathsFilePath, extensionExtensions));
         }
         return paths;
     }
 
-    static getPaths(pathsFilePath: string | null, extensions: string[]): string[] {
-        let pathsFile: PathsFile = new PathsFile(pathsFilePath);
+    static calculatePaths(pathsFilePath: string | null, extensions: string[]): string[] {
+        const pathsFile: PathsFile | null = ((pathsFilePath != null) && new PathsFile(pathsFilePath)) || null;
 
-        let paths: string[] = pathsFile.paths;
+        const paths: string[] = (pathsFile && pathsFile.paths) || [];
 
         for (let extension of extensions) {
             let extensionConfig: ExtensionConfigFile = new ExtensionConfigFile(extension);
             let extensionPathsFilePath = extensionConfig.profile.pathsFile;
             let extensionExtensions = extensionConfig.profile.extensions;
-            paths.push(...this.getPaths(extensionPathsFilePath, extensionExtensions));
+            paths.push(...this.calculatePaths(extensionPathsFilePath, extensionExtensions));
         }
         return paths;
     }
 
-    static getAliases(aliasesFilePath: string | null, extensions: string[]): Map<string, string> {
-        let aliasesFile: AliasesFile = new AliasesFile(aliasesFilePath);
+    static calculateAliases(aliasesFilePath: string | null, extensions: string[]): Map<string, string> {
+        const aliasesFile: AliasesFile | null = ((aliasesFilePath != null) && new AliasesFile(aliasesFilePath)) || null;
 
-        let aliases: Map<string, string> = aliasesFile.aliases;
+        const aliases: Map<string, string> = (aliasesFile && aliasesFile.aliases) || new Map<string, string>();
         for (let extension of extensions) {
             let extensionConfig: ExtensionConfigFile = new ExtensionConfigFile(extension);
             let extensionAliasesFilePath = extensionConfig.profile.aliasesFile;
             let extensionExtensions = extensionConfig.profile.extensions;
-            this.getAliases(extensionAliasesFilePath, extensionExtensions).forEach((value, key) => {
+            this.calculateAliases(extensionAliasesFilePath, extensionExtensions).forEach((value, key) => {
                 aliases.set(key, value);
             });
         }
         return aliases;
     }
 
-    static getStartupCommands(startupCommandsFilePath: string | null, extensions: string[]): string[] {
-        let startupCommandsFile: StartupCommandsFile = new StartupCommandsFile(startupCommandsFilePath);
+    static calculateStartupCommands(startupCommandsFilePath: string | null, extensions: string[]): string[] {
+        const startupCommandsFile: StartupCommandsFile | null = ((startupCommandsFilePath != null) && new StartupCommandsFile(startupCommandsFilePath)) || null;
 
-        let paths: string[] = startupCommandsFile.startupCommands;
+        const paths: string[] = (startupCommandsFile && startupCommandsFile.startupCommands) || [];
+
 
         for (let extension of extensions) {
             let extensionConfig: ExtensionConfigFile = new ExtensionConfigFile(extension);
             let extensionPathsFilePath = extensionConfig.profile.startupFile;
             let extensionExtensions = extensionConfig.profile.extensions;
-            paths.push(...this.getStartupPaths(extensionPathsFilePath, extensionExtensions));
+            paths.push(...this.calculateStartupPaths(extensionPathsFilePath, extensionExtensions));
         }
         return paths;
     }

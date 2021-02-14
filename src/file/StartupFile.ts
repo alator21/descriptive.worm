@@ -1,13 +1,15 @@
-import {FilePath} from "./FilePath";
-import {StartupFileWrongFormatException} from "./exceptions/StartupFileWrongFormatException";
-import {File} from "./File";
+import {SystemFile} from "./SystemFile";
+import {StartupFileWrongFormatException} from "../exceptions/StartupFileWrongFormatException";
 
-export class StartupFile extends File {
+export class StartupFile extends SystemFile {
     private readonly _startupPaths: string[];
 
 
-    constructor(path: string | null) {
+    constructor(path: string, touch?: boolean) {
         super(path);
+        if (touch) {
+            this.touch();
+        }
         let startupFile: string = this.read();
 
         let startupPaths: any[] = JSON.parse(startupFile);
@@ -18,27 +20,21 @@ export class StartupFile extends File {
             if (typeof p !== 'string') {
                 throw new StartupFileWrongFormatException();
             }
-            let startupPath: FilePath = FilePath.create(p);
-            if (!startupPath.isValid()) {
+            let startupPath: SystemFile = new SystemFile(p);
+            if (!startupPath.isFile()) {
                 throw new StartupFileWrongFormatException();
             }
         }
         this._startupPaths = startupPaths;
     }
 
-    static empty(path: string): StartupFile {
-        let fp: FilePath = FilePath.create(path);
-        fp.touch();
-        fp.appendSync('[\n\n]')
-        return new StartupFile(path)
+    touch() {
+        super.touch();
+        super.writeSync(`[\n\n]`);
     }
+
 
     get startupPaths(): string[] {
         return this._startupPaths;
-    }
-
-    write() {
-        let output: string = JSON.stringify(this._startupPaths, null, 2);
-        super.write(output);
     }
 }

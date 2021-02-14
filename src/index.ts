@@ -1,23 +1,128 @@
-#!/usr/bin/env ts-node
-import {Menu} from "./Menu";
-import {FolderPath} from "./FolderPath";
+import {ProfileCreateCommand} from "./commands/ProfileCreateCommand";
+import * as inquirer from 'inquirer';
+import {StartShFile} from "./file/StartShFile";
+import {BASE_PATH, DEFAULT_CONFIG_PATH, STARTSH_PATH} from "./tokens";
+import {ConfigFile} from "./file/ConfigFile";
+import {Profile} from "./Profile";
+import {ProfileDeleteCommand} from "./commands/ProfileDeleteCommand";
+import {Exception} from "./exceptions/Exception";
+import {ListProfilesCommand} from "./commands/ListProfilesCommand";
+import {InitCommand} from "./commands/InitCommand";
+import {SystemFolder} from "./folder/SystemFolder";
+
+const {Command} = require('commander');
 
 
-require("dotenv").config();
+let basePath = new SystemFolder(BASE_PATH);
+basePath.cdTo();
 
-const BASHRC_PATH: string = `~/.bashrc`;
-const BASE_PATH: string = '~/.nbasz';
-const DEFAULT_CONFIG_PATH: string = `${BASE_PATH}/config.json`;
-const DEFAULT_PROFILES_PATH: string = `${BASE_PATH}/profiles`;
-const STARTSH_PATH: string = `${BASE_PATH}/start.sh`;
 
-async function main() {
-    let folderPath: FolderPath = FolderPath.create(BASE_PATH);
-    if (!folderPath.isValid()) {
-        folderPath.touch();
+const program = new Command();
+
+program.version('0.0.1');
+
+program
+    .option('-r, --refresh', 'refresh configuration')
+    .option('-l, --list', 'list profiles')
+    .action((options: any) => {
+        if (options['refresh'] === true) {
+            refreshStartSh();
+        } else if (options['list'] === true) {
+            const listProfilesCommand: ListProfilesCommand = new ListProfilesCommand();
+            try {
+                listProfilesCommand.execute();
+            } catch (e) {
+                if (e instanceof Exception) {
+                    console.log(e.toString());
+                    return;
+                }
+                console.log(e);
+            }
+        }
+    })
+
+program
+    .command('init')
+    .description('creates the start file and sources it in bashrc')
+    .action(() => {
+        const initCommand: InitCommand = new InitCommand();
+        try {
+            initCommand.execute();
+        } catch (e) {
+            if (e instanceof Exception) {
+                console.log(e.toString());
+                return;
+            }
+            console.log(e);
+        }
+    })
+
+
+const profileCommand = program
+    .command('profile');
+
+
+profileCommand
+    .command('create [name]')
+    .description('create a new empty profile')
+    .action(async (name: any) => {
+        if (name == null) {
+            const answers = await inquirer
+                .prompt([
+                    {'type': 'input', 'name': 'name', 'message': 'Type the profile name'},
+                ])
+            name = answers.name;
+        }
+
+        const profileCreateCommand: ProfileCreateCommand = new ProfileCreateCommand(name);
+        try {
+            profileCreateCommand.execute();
+            refreshStartSh();
+        } catch (e) {
+            if (e instanceof Exception) {
+                console.log(e.toString());
+                return;
+            }
+            console.log(e);
+        }
+    })
+
+
+profileCommand
+    .command('delete [name]')
+    .description('delete a profile')
+    .action(async (name: any, options: any) => {
+        if (name == null) {
+            const answers = await inquirer
+                .prompt([
+                    {'type': 'input', 'name': 'name', 'message': 'Type the profile name'},
+                ])
+            name = answers.name;
+        }
+
+        const profileDeleteCommand: ProfileDeleteCommand = new ProfileDeleteCommand(name);
+        try {
+            profileDeleteCommand.execute();
+            refreshStartSh();
+        } catch (e) {
+            if (e instanceof Exception) {
+                console.log(e.toString());
+                return;
+            }
+            console.log(e);
+        }
+    })
+
+program.parse(process.argv)
+
+
+function refreshStartSh() {
+    const config: ConfigFile = new ConfigFile(DEFAULT_CONFIG_PATH);
+
+    const activeProfile: Profile | null = config.getActive();
+    if (activeProfile == null) {
+        return;
     }
-    folderPath.cdTo();
-    Menu.create(BASHRC_PATH, STARTSH_PATH, DEFAULT_CONFIG_PATH, DEFAULT_PROFILES_PATH);
+    const startSh: StartShFile = new StartShFile(STARTSH_PATH);
+    startSh.refresh(activeProfile);
 }
-
-main();

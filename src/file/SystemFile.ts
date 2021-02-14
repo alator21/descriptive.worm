@@ -1,62 +1,65 @@
-import * as fs from 'fs';
+import fs from "fs";
+import {FileDoesNotExistException} from "../exceptions/FileDoesNotExistException";
 
 const expandHomeDir = require('expand-home-dir');
 
-export class FilePath {
-    private readonly _path: string | null;
-    private readonly _expandedPath: string | null;
+export class SystemFile {
+    private readonly _path: string;
+    private readonly _expandedPath: string;
 
-
-    private constructor(path: string | null) {
+    constructor(path: string) {
         this._path = path;
         this._expandedPath = expandHomeDir(path);
     }
 
-    static create(path: string | null): FilePath {
-        return new FilePath(path);
-    }
 
-    isValid(): boolean {
-        if (this._expandedPath == null) {
-            return false;
-        }
+    exists(): boolean {
         return fs.existsSync(this._expandedPath);
     }
 
-    readSync(): string {
-        if (this._expandedPath == null) {
-            throw new Error('');
+    isFile(): boolean {
+        if (!this.exists()) {
+            return false;
         }
-        return fs.readFileSync(this._expandedPath, 'utf8');
+        const stats = fs.lstatSync(this._expandedPath);
+        return stats.isFile();
     }
 
     touch(): void {
-        if (this._expandedPath == null) {
-            throw new Error('');
+        if (this.exists()) {
+            return;
         }
-        FilePath.writeFileSyncRecursive(this._expandedPath, '');
+        SystemFile.writeFileSyncRecursive(this._expandedPath, '');
     }
 
     writeSync(data: string): void {
-        if (this._expandedPath == null) {
-            throw new Error('');
+        if (!this.isFile()) {
+            return;
         }
-        FilePath.writeFileSyncRecursive(this._expandedPath, data);
+
+        SystemFile.writeFileSyncRecursive(this._expandedPath, data);
     }
 
     appendSync(data: string): void {
-        if (this._expandedPath == null) {
-            throw new Error('');
+        if (!this.isFile()) {
+            return;
         }
         fs.appendFileSync(this._expandedPath, data)
     }
 
+    read(): string {
+        if (!this.isFile()) {
+            throw new FileDoesNotExistException(this._expandedPath);
+        }
+        return fs.readFileSync(this._expandedPath, 'utf8');
+    }
 
-    get path(): string | null {
+
+    get path(): string {
         return this._path;
     }
 
-    get expandedPath(): string | null {
+    get expandedPath(): string {
         return this._expandedPath;
     }
 
@@ -91,4 +94,5 @@ export class FilePath {
         // -- write file
         fs.writeFileSync(root + filepath, content, 'utf8');
     }
+
 }
