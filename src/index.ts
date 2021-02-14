@@ -31,6 +31,23 @@ program
         }
     })
 
+
+program
+    .command('init')
+    .description('creates the start file and sources it in bashrc')
+    .action(() => {
+        const initCommand: InitCommand = new InitCommand();
+        try {
+            initCommand.execute();
+        } catch (e) {
+            if (e instanceof Exception) {
+                console.log(e.toString());
+                return;
+            }
+            console.log(e);
+        }
+    })
+
 program
     .command('list')
     .description('lists profiles')
