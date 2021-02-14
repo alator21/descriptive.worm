@@ -104,9 +104,19 @@ profileCommand
 	.description('delete a profile')
 	.action(async (name: any, options: any) => {
 		if (name == null) {
+			const config: ConfigFile = new ConfigFile(DEFAULT_CONFIG_PATH);
+			const profileNames = Array.from(config.profiles.values()).map(r => r.name);
+			const activeProfileName: string | null = (config.getActive()?.name) || null;
 			const answers = await inquirer
 				.prompt([
-					{'type': 'input', 'name': 'name', 'message': 'Type the profile name'},
+					{
+						name: "name",
+						type: "list",
+						message: "Select the profile:",
+						choices: [...profileNames],
+						default: activeProfileName,
+						loop:true
+					}
 				])
 			name = answers.name;
 		}
@@ -129,13 +139,22 @@ profileCommand
 	.description('enable a profile')
 	.action(async (name: any, options: any) => {
 		if (name == null) {
+			const config: ConfigFile = new ConfigFile(DEFAULT_CONFIG_PATH);
+			const profileNames = Array.from(config.profiles.values()).map(r => r.name);
+			const activeProfileName: string | null = (config.getActive()?.name) || null;
 			const answers = await inquirer
 				.prompt([
-					{'type': 'input', 'name': 'name', 'message': 'Type the profile name'},
+					{
+						name: "name",
+						type: "list",
+						message: "Select the profile:",
+						choices: [...profileNames],
+						default: activeProfileName,
+						loop:true
+					}
 				])
 			name = answers.name;
 		}
-
 		const profileEnableCommand: ProfileEnableCommand = new ProfileEnableCommand(name);
 		try {
 			profileEnableCommand.execute();
