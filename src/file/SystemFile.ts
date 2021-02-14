@@ -29,7 +29,7 @@ export class SystemFile {
         if (this.exists()) {
             return;
         }
-        SystemFile.writeFileSyncRecursive(this._expandedPath, '');
+        SystemFile.writeFileSyncRecursive(this._expandedPath, '\n');
     }
 
     writeSync(data: string): void {
