@@ -10,6 +10,7 @@ import {ListProfilesCommand} from "./commands/ListProfilesCommand";
 import {InitCommand} from "./commands/InitCommand";
 import {SystemFolder} from "./folder/SystemFolder";
 import {DisplayType} from "./commands/DisplayType";
+import {ProfileEnableCommand} from "./commands/ProfileEnableCommand";
 
 const {Command} = require('commander');
 
@@ -27,23 +28,6 @@ program
     .action((options: any) => {
         if (options['refresh'] === true) {
             refreshStartSh();
-        }
-    })
-
-
-program
-    .command('init')
-    .description('creates the start file and sources it in bashrc')
-    .action(() => {
-        const initCommand: InitCommand = new InitCommand();
-        try {
-            initCommand.execute();
-        } catch (e) {
-            if (e instanceof Exception) {
-                console.log(e.toString());
-                return;
-            }
-            console.log(e);
         }
     })
 
@@ -113,6 +97,31 @@ profileCommand
         const profileDeleteCommand: ProfileDeleteCommand = new ProfileDeleteCommand(name);
         try {
             profileDeleteCommand.execute();
+            refreshStartSh();
+        } catch (e) {
+            if (e instanceof Exception) {
+                console.log(e.toString());
+                return;
+            }
+            console.log(e);
+        }
+    })
+
+profileCommand
+    .command('enable [name]')
+    .description('enable a profile')
+    .action(async (name: any, options: any) => {
+        if (name == null) {
+            const answers = await inquirer
+                .prompt([
+                    {'type': 'input', 'name': 'name', 'message': 'Type the profile name'},
+                ])
+            name = answers.name;
+        }
+
+        const profileEnableCommand: ProfileEnableCommand = new ProfileEnableCommand(name);
+        try {
+            profileEnableCommand.execute();
             refreshStartSh();
         } catch (e) {
             if (e instanceof Exception) {
