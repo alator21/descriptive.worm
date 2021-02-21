@@ -29,7 +29,7 @@ program
 		if (options['refresh'] === true) {
 			refreshStartSh();
 		}
-	})
+	});
 
 
 program
@@ -46,7 +46,7 @@ program
 			}
 			console.log(e);
 		}
-	})
+	});
 
 program
 	.command('list')
@@ -67,7 +67,7 @@ program
 			}
 			console.log(e);
 		}
-	})
+	});
 
 const profileCommand = program
 	.command('profile');
@@ -96,7 +96,7 @@ profileCommand
 			}
 			console.log(e);
 		}
-	})
+	});
 
 
 profileCommand
@@ -132,7 +132,7 @@ profileCommand
 			}
 			console.log(e);
 		}
-	})
+	});
 
 profileCommand
 	.command('enable [name]')
@@ -166,9 +166,9 @@ profileCommand
 			}
 			console.log(e);
 		}
-	})
+	});
 
-program.parse(process.argv)
+program.parse(process.argv);
 
 
 function refreshStartSh() {
