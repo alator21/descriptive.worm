@@ -61,7 +61,7 @@ export class ConfigFile extends SystemFile {
 		return this._profiles;
 	}
 
-	private static printTable(data: any, options: any) {
+	private static printTable(data: any, options: any): void {
 		if (!data || !data.length) {
 			return;
 		}
@@ -105,17 +105,17 @@ export class ConfigFile extends SystemFile {
 		this._profiles.set(profile.id, profile);
 	}
 
-	touch() {
+	touch(): void {
 		super.touch();
 		super.writeSync('[\n\n]');
 	}
 
-	write() {
+	write(): void {
 		let output: string = JSON.stringify(Array.from(this._profiles.values()), null, 2);
 		super.writeSync(output);
 	}
 
-	printProfilesFull() {
+	printProfilesFull(): void {
 		let output: any[] = [];
 		for (let profile of this._profiles.values()) {
 			output.push({
@@ -135,7 +135,7 @@ export class ConfigFile extends SystemFile {
 		});
 	}
 
-	printProfilesSimple() {
+	printProfilesSimple(): void {
 		let output: any[] = [];
 		for (let profile of this._profiles.values()) {
 			output.push({
