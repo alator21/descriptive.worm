@@ -69,6 +69,14 @@ program
 		}
 	});
 
+program
+	.command('actual')
+	.description('prints the actual configuration(start.sh file)')
+	.action(() => {
+		const startSh: StartShFile = new StartShFile(STARTSH_PATH);
+		startSh.print();
+	});
+
 const profileCommand = program
 	.command('profile');
 

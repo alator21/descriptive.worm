@@ -89,4 +89,12 @@ export class StartShFile extends SystemFile {
 
 		this.writeSync(output);
 	}
+
+	print(): void {
+		if (!this.exists()) {
+			console.log(`Couldn't find the start.sh file.`)
+			return;
+		}
+		console.log(this.read()); //TODO implement a better and more friendly print version
+	}
 }
