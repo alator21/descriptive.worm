@@ -5,7 +5,7 @@ import {AliasesFile} from "./AliasesFile";
 import {ConfigFileWrongFormatException} from "../exceptions/ConfigFileWrongFormatException";
 import {StartupCommandsFile} from "./StartupCommandsFile";
 import {table} from "table";
-import {Profile} from "../Profile";
+import {Profile} from "../profile/Profile";
 
 const chalk = require('chalk');
 

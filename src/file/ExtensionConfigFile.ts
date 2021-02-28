@@ -1,5 +1,5 @@
 import {SystemFile} from "./SystemFile";
-import {ExtensionProfile} from "../ExtensionProfile";
+import {ExtensionProfile} from "../profile/ExtensionProfile";
 import {PathsFile} from "./PathsFile";
 import {StartupFile} from "./StartupFile";
 import {AliasesFile} from "./AliasesFile";

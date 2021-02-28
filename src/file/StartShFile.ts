@@ -1,6 +1,5 @@
 import {SystemFile} from "./SystemFile";
-import {FilePathIsNotValidException} from "../exceptions/FilePathIsNotValidException";
-import {Profile} from "../Profile";
+import {Profile} from "../profile/Profile";
 
 export class StartShFile extends SystemFile {
 
@@ -21,15 +20,7 @@ export class StartShFile extends SystemFile {
 		const startupCommandsFilePath: string | null = profile.startupCommandsFile;
 		const aliasesFilePath: string | null = profile.aliasesFile;
 		const pathsFilePath: string | null = profile.pathsFile;
-		const extensions: string[] = profile.extensions
-			.map(extension => {
-				const extensionFile: SystemFile = new SystemFile(extension);
-				if (!extensionFile.isFile()) {
-					throw new FilePathIsNotValidException(extension);
-				}
-				return extension;
-			});
-
+		const extensions: string[] = profile.extensions;
 
 		const startupPaths: string[] = Profile.calculateStartupPaths(startupsFilePath, extensions);
 		const startupCommands: string[] = Profile.calculateStartupCommands(startupCommandsFilePath, extensions);

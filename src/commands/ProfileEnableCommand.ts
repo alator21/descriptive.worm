@@ -1,7 +1,7 @@
 import {Command} from "./Command";
 import {ConfigFile} from "../file/ConfigFile";
 import {DEFAULT_CONFIG_PATH} from "../tokens";
-import {Profile} from "../Profile";
+import {Profile} from "../profile/Profile";
 import {ProfileNameDoesNotExist} from "../exceptions/ProfileNameDoesNotExist";
 
 export class ProfileEnableCommand extends Command {

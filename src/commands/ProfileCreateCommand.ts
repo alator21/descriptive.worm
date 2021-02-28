@@ -11,7 +11,7 @@ import {PathsFile} from "../file/PathsFile";
 import {AliasesFile} from "../file/AliasesFile";
 import {StartupFile} from "../file/StartupFile";
 import {ConfigFile} from "../file/ConfigFile";
-import {Profile} from "../Profile";
+import {Profile} from "../profile/Profile";
 import {StartupCommandsFile} from "../file/StartupCommandsFile";
 import {FolderAlreadyExistsException} from "../exceptions/FolderAlreadyExistsException";
 

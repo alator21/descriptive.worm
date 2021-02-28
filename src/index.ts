@@ -3,7 +3,7 @@ import * as inquirer from 'inquirer';
 import {StartShFile} from "./file/StartShFile";
 import {BASE_PATH, DEFAULT_CONFIG_PATH, STARTSH_PATH} from "./tokens";
 import {ConfigFile} from "./file/ConfigFile";
-import {Profile} from "./Profile";
+import {Profile} from "./profile/Profile";
 import {ProfileDeleteCommand} from "./commands/ProfileDeleteCommand";
 import {Exception} from "./exceptions/Exception";
 import {ListProfilesCommand} from "./commands/ListProfilesCommand";
