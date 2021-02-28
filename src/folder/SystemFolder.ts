@@ -1,6 +1,5 @@
 import fs from "fs";
-
-const expandHomeDir = require('expand-home-dir');
+import {SystemPath} from "../utilities/SystemPath";
 
 export class SystemFolder {
 	private readonly _path: string;
@@ -8,8 +7,9 @@ export class SystemFolder {
 
 
 	constructor(path: string) {
-		this._path = path;
-		this._expandedPath = expandHomeDir(path);
+		const systemPath: SystemPath = new SystemPath(path);
+		this._path = systemPath.originalPath;
+		this._expandedPath = systemPath.expandedPath;
 	}
 
 	get path(): string | null {
