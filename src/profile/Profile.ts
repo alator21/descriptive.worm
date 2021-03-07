@@ -36,7 +36,7 @@ export class Profile extends AbstractProfile {
 		name: string,
 		isActive: boolean,
 		ps1: string | null,
-		pathsPath: PathsFile,
+		pathsPath: PathsFile | null,
 		startupPath: StartupFile | null,
 		aliasesPath: AliasesFile | null,
 		startupCommandsFile: StartupCommandsFile | null,

@@ -21,10 +21,13 @@
   "devDependencies": {
     "@types/chalk": "^2.2.0",
     "@types/inquirer": "^7.3.1",
+    "@types/mocha": "^8.2.1",
     "@types/node": "^13.13.4",
     "@types/table": "^5.0.0",
     "@types/uuid": "^7.0.3",
+    "mocha": "^8.3.0",
     "pkg": "^4.4.8",
+    "ts-mocha": "^8.0.0",
     "typescript": "^3.8.3"
   }
 }
