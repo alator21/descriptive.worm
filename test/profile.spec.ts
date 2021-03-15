@@ -32,4 +32,28 @@ describe('Profile tests', () => {
 		assert.strictEqual(profile.startupCommandsFile, profileJsonParsed['_startupCommandsFile'])
 		assert.strictEqual(profile.extensions, profileJsonParsed['_extensions'])
 	});
+
+	it('simple profile - calculate correct paths', () => {
+		const profileJson: string = fs.readFileSync('test/samples/test-profile-1.json', 'utf8');
+		const profileJsonParsed: any = JSON.parse(profileJson);
+		const profile: Profile = Profile.restore(
+			profileJsonParsed['_id'],
+			profileJsonParsed['_name'],
+			profileJsonParsed['_isActive'],
+			profileJsonParsed['_ps1'],
+			new PathsFile(profileJsonParsed['_pathsFile']),
+			new StartupFile(profileJsonParsed['_startupFile']),
+			new AliasesFile(profileJsonParsed['_aliasesFile']),
+			new StartupCommandsFile(profileJsonParsed['_startupCommandsFile']),
+			profileJsonParsed['_extensions']);
+
+
+		const actualPaths = Profile.calculatePaths(profile.pathsFile, profile.extensions);
+		if (profile.pathsFile == null) {
+			throw new Error('Paths file is null')
+		}
+		const expectedPathsFile = new PathsFile(profile.pathsFile);
+		assert.deepStrictEqual(actualPaths,expectedPathsFile.paths, 'paths arent equal')
+
+	});
 });
