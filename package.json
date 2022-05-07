@@ -1,11 +1,11 @@
 {
   "name": "nbasz",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "",
   "main": "src/index.ts",
   "scripts": {
     "start": "ts-node src/index.ts",
-    "build": "tsc && pkg --target linux --output dworm dist/index.js "
+    "build": "npx tsc && npx pkg --target linux --output dworm dist/src/index.js "
   },
   "keywords": [],
   "author": "Rafael Triantafillidis",

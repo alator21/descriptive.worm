@@ -43,6 +43,6 @@ export class SystemFolder {
 		if (!this.isFolder()) {
 			return;
 		}
-		process.chdir(<string>this._expandedPath);
+		process.chdir(this._expandedPath);
 	}
 }

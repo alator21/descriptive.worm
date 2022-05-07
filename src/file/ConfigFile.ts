@@ -136,7 +136,7 @@ export class ConfigFile extends SystemFile {
 	}
 
 	printProfilesSimple(): void {
-		let output: any[] = [];
+		const output: any[] = [];
 		for (let profile of this._profiles.values()) {
 			output.push({
 				'name': chalk.yellow(profile.name),
