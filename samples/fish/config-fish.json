@@ -1,0 +1,18 @@
+{
+  "_shellType":"FISH",
+  "_profiles":[
+	{
+	  "_id": "752abe57-50d2-4388-a5d6-16905d7edf5b",
+	  "_name": "main-fish",
+	  "_pathsFile": "../profiles/main-fish/paths.json",
+	  "_startupFile": "../profiles/main-fish/startup.json",
+	  "_aliasesFile": "..profiles/main-fish/aliases.json",
+	  "_startupCommandsFile": "../profiles/main-fish/startup-commands.json",
+	  "_promptPath": "../profiles/main-fish/fish_prompt.fish",
+	  "_extensions": [
+		"../extension-config-node.json"
+	  ],
+	  "_isActive": true
+	}
+  ]
+}

@@ -5,16 +5,24 @@
   "main": "src/index.ts",
   "scripts": {
     "start": "ts-node src/index.ts",
-    "build": "npx tsc && npx pkg --target linux --output dworm dist/src/index.js "
+    "build": "npx tsc && cp .env dist/.env && npx pkg . --output dworm"
   },
   "keywords": [],
   "author": "Rafael Triantafillidis",
   "license": "ISC",
+  "bin": "dist/src/index.js",
+  "pkg": {
+    "assets": ["dist/.env"],
+    "targets": [ "node14-linux" ],
+    "outputPath": "dist"
+  },
   "dependencies": {
     "chalk": "^4.0.0",
     "commander": "^7.0.0",
-    "dotenv": "^8.2.0",
+    "dotenv": "^8.6.0",
+    "dotenv-expand": "^8.0.3",
     "inquirer": "^7.3.3",
+    "loglevel": "^1.8.0",
     "table": "^5.4.6",
     "uuid": "^7.0.3"
   },

@@ -1,7 +1,7 @@
 import {Command} from "./Command";
-import {DEFAULT_CONFIG_PATH} from "../tokens";
 import {ConfigFile} from "../file/ConfigFile";
 import {DisplayType} from "./DisplayType";
+import {getConfigFile} from "../utils";
 
 export class ListProfilesCommand extends Command {
 
@@ -10,7 +10,7 @@ export class ListProfilesCommand extends Command {
 	}
 
 	execute(): void {
-		let config: ConfigFile = new ConfigFile(DEFAULT_CONFIG_PATH);
+		let config: ConfigFile = getConfigFile();
 		switch (this.displayType) {
 			case DisplayType.FULL:
 				config.printProfilesFull();
@@ -20,6 +20,4 @@ export class ListProfilesCommand extends Command {
 				break;
 		}
 	}
-
-
 }

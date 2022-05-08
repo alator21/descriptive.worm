@@ -1,7 +1,7 @@
 import fs from "fs";
 import {FileDoesNotExistException} from "../exceptions/FileDoesNotExistException";
 import {SystemPath} from "../utilities/SystemPath";
-
+import log from "loglevel";
 
 export class SystemFile {
 	private readonly _path: string;
@@ -11,6 +11,7 @@ export class SystemFile {
 		const systemPath: SystemPath = new SystemPath(path);
 		this._path = systemPath.originalPath;
 		this._expandedPath = systemPath.expandedPath;
+		log.debug(`SystemFile: ${this._path}`);
 	}
 
 	get path(): string {

@@ -1,8 +1,8 @@
 import {Command} from "./Command";
 import {ConfigFile} from "../file/ConfigFile";
-import {DEFAULT_CONFIG_PATH} from "../tokens";
 import {Profile} from "../profile/Profile";
 import {ProfileNameDoesNotExist} from "../exceptions/ProfileNameDoesNotExist";
+import {getConfigFile} from "../utils";
 
 export class ProfileEnableCommand extends Command {
 	private readonly profileName: string;
@@ -13,8 +13,8 @@ export class ProfileEnableCommand extends Command {
 	}
 
 	execute(): void {
-		let config: ConfigFile = new ConfigFile(DEFAULT_CONFIG_PATH);
-		const profiles: Map<string, Profile> = config.profiles;
+		let config: ConfigFile = getConfigFile();
+		const profiles: Map<string, Profile> = config.profiles();
 
 		let activeProfile: Profile | null = config.getActive();
 		if (activeProfile != null) {

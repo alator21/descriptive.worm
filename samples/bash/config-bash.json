@@ -1,0 +1,17 @@
+{
+  "_shellType":"BASH",
+  "_profiles":[
+	{
+	  "_id": "752abe57-50d2-4388-a5d6-16905d7edf5b",
+	  "_name": "main-bash",
+	  "_pathsFile": "../profiles/main-bash/paths.json",
+	  "_startupFile": "../profiles/main-bash/startup.json",
+	  "_aliasesFile": "..profiles/main-bash/aliases.json",
+	  "_startupCommandsFile": "../profiles/main-bash/startup-commands.json",
+	  "_extensions": [
+		"../extension-config-node.json"
+	  ],
+	  "_isActive": true
+	}
+  ]
+}

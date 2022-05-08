@@ -1,54 +1,27 @@
 import {SystemFile} from "./SystemFile";
-import {PathsFile} from "./PathsFile";
-import {StartupFile} from "./StartupFile";
-import {AliasesFile} from "./AliasesFile";
-import {ConfigFileWrongFormatException} from "../exceptions/ConfigFileWrongFormatException";
-import {StartupCommandsFile} from "./StartupCommandsFile";
 import {table} from "table";
 import {Profile} from "../profile/Profile";
+import {ShellType} from "./ShellType";
+import {ConfigFileWrongFormatException} from "../exceptions/ConfigFileWrongFormatException";
+import log from "loglevel";
 
 const chalk = require('chalk');
 
-export class ConfigFile extends SystemFile {
-	private readonly _profiles: Map<string/*profileId*/, Profile>;
-
-
-	constructor(path: string, touch?: boolean) {
+export abstract class ConfigFile extends SystemFile {
+	protected constructor(path: string, touch?: boolean) {
 		super(path);
+		if (touch) {
+			this.touch();
+		}
+	}
+
+	static determineShellType(path: string): ShellType {
 		try {
-			if (touch) {
-				this.touch();
-			}
-			const configFile: string = this.read();
+			const config: SystemFile = new SystemFile(path);
+			const configFile: string = config.read();
 			const json = JSON.parse(configFile);
-			const profiles: Map<string, Profile> = new Map<string, Profile>();
-			for (let key of Object.keys(json)) {
-				let profileJson = json[key];
-				let {
-					_id,
-					_name,
-					_startupFile,
-					_aliasesFile,
-					_isActive,
-					_ps1,
-					_pathsFile,
-					_startupCommandsFile,
-					_extensions
-				} = profileJson;
-				profiles
-					.set(_id, Profile.restore(
-						_id,
-						_name,
-						_isActive,
-						_ps1,
-						new PathsFile(_pathsFile),
-						new StartupFile(_startupFile),
-						new AliasesFile(_aliasesFile),
-						new StartupCommandsFile(_startupCommandsFile),
-						_extensions
-					));
-			}
-			this._profiles = profiles;
+			const shellType: keyof typeof ShellType = json['_shellType'];
+			return ShellType[shellType];
 		} catch (exception) {
 			if (exception instanceof SyntaxError) {
 				throw new ConfigFileWrongFormatException();
@@ -57,11 +30,10 @@ export class ConfigFile extends SystemFile {
 		}
 	}
 
-	get profiles(): Map<string, Profile> {
-		return this._profiles;
-	}
+	abstract profiles(): Map<string/*profileId*/, Profile>;
 
-	private static printTable(data: any, options: any): void {
+
+	protected static printTable(data: any, options: any): void {
 		if (!data || !data.length) {
 			return;
 		}
@@ -77,11 +49,11 @@ export class ConfigFile extends SystemFile {
 				width: 15
 			}
 		});
-		console.log(tableText);
+		log.info(tableText);
 	}
 
 	getActive(): Profile | null {
-		for (let profile of this._profiles.values()) {
+		for (let profile of this.profiles().values()) {
 			if (profile.isActive) {
 				return profile;
 			}
@@ -89,55 +61,39 @@ export class ConfigFile extends SystemFile {
 		return null;
 	}
 
+	protected abstract addActualProfile(profile: Profile): void;
+
 	addProfile(profile: Profile): void {
-		const p = this._profiles.get(profile.id);
+		const p = this.profiles().get(profile.id);
 		if (p != null) {
 			return;
 		}
 		if (profile.isActive) {
-			for (let prof of this._profiles.values()) {
+			for (let prof of this.profiles().values()) {
 				if (prof.isActive) {
 					prof.disable();
 					break;
 				}
 			}
 		}
-		this._profiles.set(profile.id, profile);
+		this.addActualProfile(profile);
 	}
 
 	touch(): void {
 		super.touch();
-		super.writeSync('[\n\n]');
+		super.writeSync('{\n\n}');
 	}
 
 	write(): void {
-		let output: string = JSON.stringify(Array.from(this._profiles.values()), null, 2);
+		let output: string = JSON.stringify(Array.from(this.profiles().values()), null, 2);
 		super.writeSync(output);
 	}
 
-	printProfilesFull(): void {
-		let output: any[] = [];
-		for (let profile of this._profiles.values()) {
-			output.push({
-				'id': chalk.blue(profile.id),
-				'name': chalk.yellow(profile.name),
-				'ps1': `${(profile.ps1 && (chalk.cyan(profile.ps1.substring(0, 20)) + chalk.red('...')) || '')}`,
-				'paths': chalk.yellow(profile.pathsFile),
-				'startup': chalk.yellow(profile.startupFile),
-				'aliases': chalk.yellow(profile.aliasesFile),
-				'startup-commands': chalk.yellow(profile.startupCommandsFile),
-				'extensions': chalk.magenta(profile.extensions.join(',')),
-				'active': chalk.cyan(profile.isActive)
-			});
-		}
-		ConfigFile.printTable(output, {
-			headerStyleFn: (header: any) => chalk.bold(chalk.red(header))
-		});
-	}
+	abstract printProfilesFull(): void;
 
 	printProfilesSimple(): void {
 		const output: any[] = [];
-		for (let profile of this._profiles.values()) {
+		for (let profile of this.profiles().values()) {
 			output.push({
 				'name': chalk.yellow(profile.name),
 				'active': chalk.cyan(profile.isActive)

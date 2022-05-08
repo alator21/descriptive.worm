@@ -1,6 +1,5 @@
 import {SystemFile} from "../file/SystemFile";
 import {PathsFile} from "../file/PathsFile";
-import {ExtensionConfigFile} from "../file/ExtensionConfigFile";
 import {StartupFile} from "../file/StartupFile";
 import {AliasesFile} from "../file/AliasesFile";
 import {StartupCommandsFile} from "../file/StartupCommandsFile";

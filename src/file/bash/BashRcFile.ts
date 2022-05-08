@@ -1,5 +1,5 @@
-import {SystemFile} from "./SystemFile";
-import {STARTSH_PATH} from "../tokens";
+import {SystemFile} from "../SystemFile";
+import {STARTSH_PATH} from "../../tokens";
 
 export class BashRcFile extends SystemFile {
 

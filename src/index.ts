@@ -1,9 +1,8 @@
 import {ProfileCreateCommand} from "./commands/ProfileCreateCommand";
 import * as inquirer from 'inquirer';
 import {StartShFile} from "./file/StartShFile";
-import {BASE_PATH, DEFAULT_CONFIG_PATH, STARTSH_PATH} from "./tokens";
+import {BASE_PATH, LOG_LEVEL} from "./tokens";
 import {ConfigFile} from "./file/ConfigFile";
-import {Profile} from "./profile/Profile";
 import {ProfileDeleteCommand} from "./commands/ProfileDeleteCommand";
 import {Exception} from "./exceptions/Exception";
 import {ListProfilesCommand} from "./commands/ListProfilesCommand";
@@ -11,10 +10,15 @@ import {InitCommand} from "./commands/InitCommand";
 import {SystemFolder} from "./folder/SystemFolder";
 import {DisplayType} from "./commands/DisplayType";
 import {ProfileEnableCommand} from "./commands/ProfileEnableCommand";
+import {getConfigFile, getStartShFile, refreshStartSh} from "./utils";
+import log from 'loglevel';
 
 const {Command} = require('commander');
 
 
+log.setLevel(log.levels[LOG_LEVEL]);
+log.debug('Starting...');
+log.debug(process.env);
 let basePath = new SystemFolder(BASE_PATH);
 basePath.cdTo();
 
@@ -41,10 +45,10 @@ program
 			initCommand.execute();
 		} catch (e) {
 			if (e instanceof Exception) {
-				console.log(e.toString());
+				log.error(e.toString());
 				return;
 			}
-			console.log(e);
+			log.error(e);
 		}
 	});
 
@@ -62,10 +66,10 @@ program
 			listProfilesCommand.execute();
 		} catch (e) {
 			if (e instanceof Exception) {
-				console.log(e.toString());
+				log.error(e.toString());
 				return;
 			}
-			console.log(e);
+			log.error(e);
 		}
 	});
 
@@ -73,7 +77,7 @@ program
 	.command('actual')
 	.description('prints the actual configuration(start.sh file)')
 	.action(() => {
-		const startSh: StartShFile = new StartShFile(STARTSH_PATH);
+		const startSh: StartShFile = getStartShFile();
 		startSh.print();
 	});
 
@@ -99,10 +103,10 @@ profileCommand
 			refreshStartSh();
 		} catch (e) {
 			if (e instanceof Exception) {
-				console.log(e.toString());
+				log.error(e.toString());
 				return;
 			}
-			console.log(e);
+			log.error(e);
 		}
 	});
 
@@ -112,8 +116,8 @@ profileCommand
 	.description('delete a profile')
 	.action(async (name: any, options: any) => {
 		if (name == null) {
-			const config: ConfigFile = new ConfigFile(DEFAULT_CONFIG_PATH);
-			const profileNames = Array.from(config.profiles.values()).map(r => r.name);
+			const config: ConfigFile = getConfigFile();
+			const profileNames = Array.from(config.profiles().values()).map(r => r.name);
 			const activeProfileName: string | null = (config.getActive()?.name) || null;
 			const answers = await inquirer
 				.prompt([
@@ -123,7 +127,7 @@ profileCommand
 						message: "Select the profile:",
 						choices: [...profileNames],
 						default: activeProfileName,
-						loop:true
+						loop: true
 					}
 				])
 			name = answers.name;
@@ -135,10 +139,10 @@ profileCommand
 			refreshStartSh();
 		} catch (e) {
 			if (e instanceof Exception) {
-				console.log(e.toString());
+				log.error(e.toString());
 				return;
 			}
-			console.log(e);
+			log.error(e);
 		}
 	});
 
@@ -147,8 +151,8 @@ profileCommand
 	.description('enable a profile')
 	.action(async (name: any, options: any) => {
 		if (name == null) {
-			const config: ConfigFile = new ConfigFile(DEFAULT_CONFIG_PATH);
-			const profileNames = Array.from(config.profiles.values()).map(r => r.name);
+			const config: ConfigFile = getConfigFile();
+			const profileNames = Array.from(config.profiles().values()).map(r => r.name);
 			const activeProfileName: string | null = (config.getActive()?.name) || null;
 			const answers = await inquirer
 				.prompt([
@@ -158,7 +162,7 @@ profileCommand
 						message: "Select the profile:",
 						choices: [...profileNames],
 						default: activeProfileName,
-						loop:true
+						loop: true
 					}
 				])
 			name = answers.name;
@@ -169,23 +173,12 @@ profileCommand
 			refreshStartSh();
 		} catch (e) {
 			if (e instanceof Exception) {
-				console.log(e.toString());
+				log.error(e.toString());
 				return;
 			}
-			console.log(e);
+			log.error(e);
 		}
 	});
 
 program.parse(process.argv);
-
-
-function refreshStartSh() {
-	const config: ConfigFile = new ConfigFile(DEFAULT_CONFIG_PATH);
-
-	const activeProfile: Profile | null = config.getActive();
-	if (activeProfile == null) {
-		return;
-	}
-	const startSh: StartShFile = new StartShFile(STARTSH_PATH);
-	startSh.refresh(activeProfile);
-}
+log.debug('END');
