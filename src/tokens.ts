@@ -6,6 +6,7 @@ const myEnv = dotenv.config({
 });
 dotenvExpand.expand(myEnv);
 export const BASHRC_PATH: string = process.env['BASHRC_PATH'] || '~/.bashrc';
+export const FISHRC_PATH: string = process.env['FISHRC_PATH'] || '~/.config/fish/config.fish';
 export const BASE_PATH: string = process.env['BASE_PATH'] || '~/.dworm';
 export const CONFIG_PATH: string = process.env['CONFIG_PATH'] || `${BASE_PATH}/config.json`;
 export const PROFILES_PATH: string = process.env['PROFILES_PATH'] || `${BASE_PATH}/profiles`;
