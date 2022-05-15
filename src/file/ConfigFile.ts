@@ -85,7 +85,7 @@ export abstract class ConfigFile extends SystemFile {
 	}
 
 	write(): void {
-		let output: string = JSON.stringify(Array.from(this.profiles().values()), null, 2);
+		const output: string = JSON.stringify(Array.from(this.profiles().values()), null, 2);
 		super.writeSync(output);
 	}
 

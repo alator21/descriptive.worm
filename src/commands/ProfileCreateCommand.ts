@@ -1,12 +1,6 @@
 import {Command} from "./Command";
 import {ProfileNameAlreadyExists} from "../exceptions/ProfileNameAlreadyExists";
-import {
-	PROFILE_ALIASES_NAME,
-	PROFILE_PATHS_NAME,
-	PROFILE_STARTUP_COMMANDS_NAME,
-	PROFILE_STARTUPS_NAME,
-	PROFILES_PATH
-} from "../tokens";
+import {PROFILE_ALIASES_NAME, PROFILE_PATHS_NAME, PROFILE_STARTUP_COMMANDS_NAME, PROFILE_STARTUPS_NAME, PROFILES_PATH} from "../tokens";
 import {ProfileFolder} from "../folder/ProfileFolder";
 import {PathsFile} from "../file/PathsFile";
 import {AliasesFile} from "../file/AliasesFile";
@@ -15,12 +9,7 @@ import {ConfigFile} from "../file/ConfigFile";
 import {Profile} from "../profile/Profile";
 import {StartupCommandsFile} from "../file/StartupCommandsFile";
 import {FolderAlreadyExistsException} from "../exceptions/FolderAlreadyExistsException";
-import {BashProfile} from "../profile/bash/BashProfile";
-import {FishProfile} from "../profile/fish/FishProfile";
-import {UnknownShellException} from "../exceptions/UnknownShellException";
-import {BashConfigFile} from "../file/bash/BashConfigFile";
-import {FishConfigFile} from "../file/fish/FishConfigFile";
-import {getConfigFile} from "../utils";
+import {createProfile, getConfigFile} from "../utils";
 
 export class ProfileCreateCommand extends Command {
 	private readonly profileName: string;
@@ -41,14 +30,7 @@ export class ProfileCreateCommand extends Command {
 		}
 		const folderName: string = `${PROFILES_PATH}/${this.profileName}`;
 		this.createEmptyStructure(folderName);
-		let newProfile: Profile | undefined = undefined;
-		if (config instanceof BashConfigFile) {
-			newProfile = BashProfile.create(this.profileName);
-		} else if (config instanceof FishConfigFile) {
-			newProfile = FishProfile.create(this.profileName);
-		} else {
-			throw new UnknownShellException();
-		}
+		let newProfile: Profile = createProfile(this.profileName);
 		newProfile.updatePathsPath(new PathsFile(`${folderName}/${PROFILE_PATHS_NAME}.json`));
 		newProfile.updateAliasesPath(new AliasesFile(`${folderName}/${PROFILE_ALIASES_NAME}.json`));
 		newProfile.updateStartupPath(new StartupFile(`${folderName}/${PROFILE_STARTUPS_NAME}.json`));

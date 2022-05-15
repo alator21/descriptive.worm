@@ -1,7 +1,7 @@
-import {SystemFile} from "../SystemFile";
 import {STARTSH_PATH} from "../../tokens";
+import {RcFile} from "../RcFile";
 
-export class BashRcFile extends SystemFile {
+export class BashRcFile extends RcFile {
 
 	constructor(path: string) {
 		super(path);
